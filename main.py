@@ -4,7 +4,7 @@ import numpy as np
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+    print(f'Hi, {name}')
 
 
 
@@ -14,10 +14,4 @@ if __name__ == '__main__':
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
-arr = {"hej", "øl", "te"}
-
-print(arr)
-
-for x in arr:
-    print(x)
 
