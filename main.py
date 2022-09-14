@@ -1,19 +1,14 @@
 import numpy as np
 import pandas as pd
 from helpers.helperFunctions import findArea
-
 import matplotlib.pyplot as plt
 from mplsoccer import Pitch
 
 event_data = pd.read_csv ('C:/ITU/ITU_Research_Project/WyScout_Data_Two/NewEvents/Wyscout_Events.csv', sep=";")
-subEvents = event_data.loc[:, ['id', 'subEventName', 'x', 'y']]
-
-subEvents_with_Zones = df = pd.DataFrame(columns = ['id', 'event_zone'])
 event_data = event_data[event_data.subEventName.notnull()]
-
 event_data['event_zone'] = event_data.apply(lambda row: findArea(row), axis=1)
 
-
+event_data.head(5)
 
 pitch = Pitch(pitch_type='wyscout', axis=True, label=True, tick=True)
 fig, ax = pitch.draw()
@@ -23,7 +18,57 @@ shape3 = np.array([[50, 0], [100, 0], [100, 50], [50, 50]])
 shape4 = np.array([[50, 50], [100, 50], [100, 100], [50, 100]])
 areas = [shape1, shape2, shape3, shape4]
 pitch.polygon(areas , edgecolor='black', fc=[1, 0, 0], alpha=0.3, ax=ax)
+
+
+data = np.array([
+    [0, 0],
+    [16,0], # x+16
+    [0, 19],
+    [16, 19], # x+17
+    [33, 0],
+    [33, 19],
+    [67, 0], # x+34
+    [67, 19],
+    [84, 0],
+    [84, 19],
+    [100, 0],
+    [100, 19],
+    [0, 81],
+    [0, 100],
+    [16, 81],
+    [16, 100],
+    [33, 81],
+    [33, 100],
+    [67, 81],  # x+34
+    [67, 100],
+    [84, 81],
+    [84, 100],
+    [100, 81],
+    [100, 100],
+    [16, 63],
+    [16, 63],
+    [16, 63],
+    [33, 63],
+    [67, 63],
+    [16, 37],
+    [33, 37],
+    [50, 19],
+    [50, 0],
+    [50, 37],
+    [50, 63],
+    [50, 81],
+    [50, 100],
+    [67, 37],
+    [84, 37],
+    [84, 63],
+])
+pitch = Pitch(pitch_type='wyscout', axis=True,
+               positional=True,
+              tick=True,
+              label=True)
+fig, ax = pitch.draw()
+
+x, y = data.T
+plt.scatter(x,y)
 plt.show()
-
-
 
