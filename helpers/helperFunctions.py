@@ -63,16 +63,28 @@ def findArea(x, y):
     else: s = 0
     return s
 
+def findArea2(x, y):
+    s = ""
+  #  id = row['id']
+    #print(row)
+    #x = row['x']
+    #y = row['y']
+    if(x >= 0 and x <= 16 and y >=0 and y <=19):
+        s = 1
+    else:
+        s = 0
+    return s
+
 
 def zones(df, temp):
     df1 = df.iloc[:1000000, :]
-    df2 = df.iloc[1000000:2000000, :]
-    df3 = df.iloc[2000000:3000000, :]
-    df4 = df.iloc[3000000:4000000, :]
-    df5 = df.iloc[4000000:, :]
+    #df2 = df.iloc[1000000:2000000, :]
+    #df3 = df.iloc[2000000:3000000, :]
+    #df4 = df.iloc[3000000:4000000, :]
+    #df5 = df.iloc[4000000:, :]
     for i in temp:
         name = i + '_zone'
-        df1[name] = np.where(df1['subEventName'] == i, findArea(df1['x'], df1['y']), np.nan)
+        df1[name] = np.where(df1['subEventName'] == i, findArea2(df1['x'], df1['y']), np.nan)
     return df1
     for i in temp:
         name = i + '_zone'
