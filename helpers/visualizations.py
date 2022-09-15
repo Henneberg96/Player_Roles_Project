@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mplsoccer import Pitch
 
+#Define pitch with predeefiend rows
 def createPitchWithZones():
     data = np.array([
         [0, 0],

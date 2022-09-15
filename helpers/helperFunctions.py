@@ -1,5 +1,6 @@
 import pandas as pd
 
+#Filter to determine where an event occured
 def findArea(row):
     s = ""
   #  id = row['id']
