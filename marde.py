@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import StandardScaler
 from helpers.helperFunctions import *
 
 # load event file
@@ -60,6 +61,7 @@ print(df.shape)  # 33 columns at this point
 # drop irelevant sub events
 df = df[df.subEventName.notnull()]
 df = df[df.subEventName != 'Whistle']
+df = df[df.playerId != 0]
 
 # merge with matches dataset to get season ID
 matches = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Matches.csv',
@@ -165,8 +167,57 @@ for i in temp3:
 
 print(dfc.shape)  # 146 columns at this point
 
-# removing playerId=0
-dfc = dfc[dfc.playerId != 0]
-
 # exporting dataframe
 dfc.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_cleaned.csv', index=False)
+
+# importing cleaned df
+dfc = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_cleaned.csv',
+                 sep=",",
+                 encoding='unicode_escape')
+
+# stat ratios
+dfc['goals_pr_shot'] = dfc['goal'] / dfc['Shot']
+dfc['pp_pass_ratio'] = dfc['progressive_passes'] / (dfc['Cross'] + dfc['Hand pass'] + dfc['Head pass'] + dfc['High pass'] + dfc['Launch'] + dfc['Simple pass'] + dfc['Smart pass'])
+dfc['key_pass_ratio'] = dfc['key_pass'] / (dfc['Cross'] + dfc['Hand pass'] + dfc['Head pass'] + dfc['High pass'] + dfc['Launch'] + dfc['Simple pass'] + dfc['Smart pass'])
+dfc['acc_ratio'] = dfc['accurate'] / dfc['not_accurate']
+dfc['counter_opportunity_ratio'] = dfc['counter_attack'] / dfc['opportunity']
+dfc['anticipation_percentage'] = dfc['anticipated'] / dfc['Ground defending duel']
+dfc['interception_percentage'] = dfc['interception'] / (dfc['Ground loose ball duel'] + dfc['Ground attacking duel'])
+dfc['slide_tackle_ratio'] = dfc['sliding_tackle'] / (dfc['Ground loose ball duel'] + dfc['Ground attacking duel'] + dfc['Ground defending duel'])
+dfc['dangerous_duel_loss_ratio'] = dfc['dangerous_ball_lost'] / (dfc['Ground loose ball duel'] + dfc['Ground attacking duel'])
+
+# merging with played minutes
+minutes = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Positions_Minutes.csv',
+                 sep=";",
+                 encoding='unicode_escape')
+minutes.pop('Unnamed: 0')
+minutes.pop('teamId')
+minutes.pop('matchId')
+minutes.pop('position')
+minutes = minutes.groupby(['playerId', 'seasonId'], as_index=False).sum()
+dfc = pd.merge(dfc, minutes, on=['playerId', 'seasonId'])
+
+# normalizing with per 90
+dfc = dfc[dfc.time > 500] # cutoff minutes
+dfc['games'] = dfc['time'] / 90
+df_id = dfc.iloc[:, np.r_[0, 1]]
+df_norm = dfc.iloc[:, np.r_[0, 1, 2:83, 156]]
+df_none = dfc.iloc[:, np.r_[0, 1, 84:154]]
+
+df_norm = df_norm.iloc[:,2:83].div(df_norm.games, axis=0)
+
+dfn = pd.merge(df_id, df_norm, left_index=True, right_index=True)
+dfn = pd.merge(dfn, df_none, on=['playerId', 'seasonId'])
+
+# moving teamId to the front
+tId = dfn.pop('teamId')
+dfn.insert(2, 'teamId', tId, allow_duplicates=True)
+
+# further normalization - scaling
+scale = StandardScaler()
+dfn_id = dfn.iloc[:, np.r_[0:3]]
+dfn_scale = dfn.iloc[:, np.r_[3:153]]
+
+dfn_scale = dfn_scale[dfn_scale.columns] = scale.fit_transform(dfn_scale[dfn_scale.columns])
+
+dfn['slide_tackle_ratio'].dtypes
