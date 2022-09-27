@@ -215,9 +215,13 @@ dfn.insert(2, 'teamId', tId, allow_duplicates=True)
 
 # further normalization - scaling
 scale = StandardScaler()
+dfn.replace([np.inf, -np.inf], 0, inplace=True)
 dfn_id = dfn.iloc[:, np.r_[0:3]]
 dfn_scale = dfn.iloc[:, np.r_[3:153]]
+dfn_scaled = dfn_scale.copy()
 
-dfn_scale = dfn_scale[dfn_scale.columns] = scale.fit_transform(dfn_scale[dfn_scale.columns])
+dfn_scaled[dfn_scaled.columns] = scale.fit_transform(dfn_scaled[dfn_scaled.columns])
+dfn = pd.merge(dfn_id, dfn_scaled, left_index=True, right_index=True)
 
-dfn['slide_tackle_ratio'].dtypes
+# exporting cleaned and normalized df
+dfn.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_CN.csv', index=False)
