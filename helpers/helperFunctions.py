@@ -106,3 +106,20 @@ def gmode(df):
 def gmodeHelp(x):
     m = pd.Series.mode(x)
     return m.values[0] if not m.empty else np.nan
+
+def pos_group(row):
+    x = row['map_group']
+    d = ['CB', 'RB', 'LB', 'LWB', 'RWB']
+    m = ['AM', 'CM', 'DM']
+    w = ['LM', 'RM', 'LW', 'RW']
+    f = ['FW']
+    if x in d:
+        return "DEF"
+    elif x in m:
+        return "MID"
+    elif x in w:
+        return "WING"
+    elif x in f:
+        return "ATT"
+    else:
+        return "other"
