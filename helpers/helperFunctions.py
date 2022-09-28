@@ -109,11 +109,14 @@ def gmodeHelp(x):
 
 def pos_group(row):
     x = row['map_group']
+    g = ['GK']
     d = ['CB', 'RB', 'LB', 'LWB', 'RWB']
     m = ['AM', 'CM', 'DM']
     w = ['LM', 'RM', 'LW', 'RW']
     f = ['FW']
-    if x in d:
+    if x in g:
+        return "GK"
+    elif x in d:
         return "DEF"
     elif x in m:
         return "MID"

@@ -223,5 +223,33 @@ dfn_scaled = dfn_scale.copy()
 dfn_scaled[dfn_scaled.columns] = scale.fit_transform(dfn_scaled[dfn_scaled.columns])
 dfn = pd.merge(dfn_id, dfn_scaled, left_index=True, right_index=True)
 
-# exporting cleaned and normalized df
+# starting position merging and cleaning - saving IDs and merging with positions
+pos = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Positions_Minutes.csv', sep=";", encoding='unicode_escape')
+pos2 = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Simple_Positions.csv', sep=";", encoding='unicode_escape')
+pos2.drop(columns=pos2.columns[0], axis=1, inplace=True)
+pos2 = pos2.drop(['pos_group', 'radar_group'], axis=1)
+pos = pd.merge(pos, pos2, on=['position'])
+pos.drop(columns=pos.columns[0], axis=1, inplace=True)
+pos = pos.drop(['matchId', 'teamId', 'position', 'time'], axis=1)
+
+pos = pos.groupby(['playerId', 'seasonId'], as_index=False).agg(gmodeHelp)
+pos.insert(3, 'pos_group', pos.apply(lambda row: pos_group(row), axis=1), allow_duplicates=True)
+dfn = pd.merge(dfn, pos, on=['playerId', 'seasonId'])
+
+# removing goalkeepers
+dfn = dfn[dfn.map_group != 'GK']
+nan_check = pd.DataFrame(dfn.isna().sum())
+dfn_pos = dfn[['playerId', 'seasonId', "map_group", "pos_group"]]
+
+# removing unwanted columns - accurate stats (duplicate), goalkeeper stats, irrelevant zones, irrelevant accuracy %
+dfn = dfn.drop(['Simple pass_acc', 'Clearance_acc', 'Air duel_acc', 'Cross_acc', 'Launch_acc', 'Ground attacking duel_acc', 'Head pass_acc', 'Ground loose ball duel_acc', 'Ground defending duel_acc', 'Free Kick_acc', 'High pass_acc', 'Throw in_acc', 'Smart pass_acc', 'Free kick cross_acc', 'Save attempt_acc', 'Acceleration_acc', 'Corner_acc', 'Shot_acc', 'Reflexes_acc', 'Hand pass_acc', 'Free kick shot_acc', 'Penalty_acc',
+              'Goal kick', 'Goalkeeper leaving line', 'Hand pass', 'Reflexes', 'Save attempt',
+              'Ball out of the field_zone', 'Free Kick_zone', 'Hand foul_zone', 'Throw in_zone', 'Free kick cross_zone', 'Save attempt_zone', 'Goal kick_zone', 'Corner_zone', 'Goalkeeper leaving line_zone', 'Reflexes_zone', 'Hand pass_zone', 'Free kick shot_zone', 'Protest_zone', 'Late card foul_zone', 'Penalty_zone', 'Time lost foul_zone', 'Out of game foul_zone', 'Violent Foul_zone', 'Simulation_zone',
+              'Throw in_acc_percentage', 'Save attempt_acc_percentage', 'Reflexes_acc_percentage', 'Hand pass_acc_percentage'],
+             axis=1)
+
+# filling nan
+dfn = dfn.fillna(0)
+
+# exporting
 dfn.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_CN.csv', index=False)
