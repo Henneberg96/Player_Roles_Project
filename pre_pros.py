@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import RobustScaler
 from helpers.helperFunctions import *
 
 # load event file
@@ -74,6 +74,10 @@ sznInd = df.pop('seasonId')
 df.insert(6, 'seasonId', sznInd, allow_duplicates=True)
 
 print(df.shape)  # 35 columns at this point
+
+# saving passing stats
+passes = df[df.eventName == 'Pass']
+passes.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/passes.csv', index=False)
 
 # rearranging columns
 eIdInd = df.pop('id')
@@ -198,7 +202,7 @@ minutes = minutes.groupby(['playerId', 'seasonId'], as_index=False).sum()
 dfc = pd.merge(dfc, minutes, on=['playerId', 'seasonId'])
 
 # normalizing with per 90
-dfc = dfc[dfc.time > 500] # cutoff minutes
+dfc = dfc[dfc.time > 900] # cutoff minutes
 dfc['games'] = dfc['time'] / 90
 df_id = dfc.iloc[:, np.r_[0, 1]]
 df_norm = dfc.iloc[:, np.r_[0, 1, 2:83, 156]]
@@ -214,7 +218,7 @@ tId = dfn.pop('teamId')
 dfn.insert(2, 'teamId', tId, allow_duplicates=True)
 
 # further normalization - scaling
-scale = StandardScaler()
+scale = RobustScaler()
 dfn.replace([np.inf, -np.inf], 0, inplace=True)
 dfn_id = dfn.iloc[:, np.r_[0:3]]
 dfn_scale = dfn.iloc[:, np.r_[3:153]]
@@ -241,15 +245,25 @@ dfn = dfn[dfn.map_group != 'GK']
 nan_check = pd.DataFrame(dfn.isna().sum())
 dfn_pos = dfn[['playerId', 'seasonId', "map_group", "pos_group"]]
 
-# removing unwanted columns - accurate stats (duplicate), goalkeeper stats, irrelevant zones, irrelevant accuracy %
+# removing unwanted columns - accurate stats (duplicate), goalkeeper stats, irrelevant zones, irrelevant accuracy %, irrelevant stats for a player's role (not necessarily clustering)
 dfn = dfn.drop(['Simple pass_acc', 'Clearance_acc', 'Air duel_acc', 'Cross_acc', 'Launch_acc', 'Ground attacking duel_acc', 'Head pass_acc', 'Ground loose ball duel_acc', 'Ground defending duel_acc', 'Free Kick_acc', 'High pass_acc', 'Throw in_acc', 'Smart pass_acc', 'Free kick cross_acc', 'Save attempt_acc', 'Acceleration_acc', 'Corner_acc', 'Shot_acc', 'Reflexes_acc', 'Hand pass_acc', 'Free kick shot_acc', 'Penalty_acc',
               'Goal kick', 'Goalkeeper leaving line', 'Hand pass', 'Reflexes', 'Save attempt',
               'Ball out of the field_zone', 'Free Kick_zone', 'Hand foul_zone', 'Throw in_zone', 'Free kick cross_zone', 'Save attempt_zone', 'Goal kick_zone', 'Corner_zone', 'Goalkeeper leaving line_zone', 'Reflexes_zone', 'Hand pass_zone', 'Free kick shot_zone', 'Protest_zone', 'Late card foul_zone', 'Penalty_zone', 'Time lost foul_zone', 'Out of game foul_zone', 'Violent Foul_zone', 'Simulation_zone',
-              'Throw in_acc_percentage', 'Save attempt_acc_percentage', 'Reflexes_acc_percentage', 'Hand pass_acc_percentage'],
+              'Throw in_acc_percentage', 'Save attempt_acc_percentage', 'Reflexes_acc_percentage', 'Hand pass_acc_percentage',
+                'own_goal', 'Ball out of the field', 'Hand foul', 'Out of game foul', 'Protest', 'Simulation', 'Throw in', 'Time lost foul', 'Launch', 'Launch_zone', 'Launch_acc_percentage', 'head', 'feint', 'Touch', 'Touch_zone', 'Clearance_acc_percentage'],
              axis=1)
 
 # filling nan
 dfn = dfn.fillna(0)
 
-# exporting
+# exporting pre UMAP file
 dfn.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_CN.csv', index=False)
+
+# removing unwanted columns for UMAP - assigned stats (pen, free-kick, corners)
+dfn = dfn.drop(['Penalty', 'Penalty_acc_percentage',
+                'Free kick shot', 'Free kick shot_acc_percentage', 'Free kick cross', 'Free kick cross_acc_percentage', 'Free Kick', 'Free Kick_acc_percentage',
+                'Corner', 'Corner_acc_percentage'],
+             axis=1)
+
+# exporting UMAP formatted file
+dfn.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_CN_UMAP.csv', index=False)

@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
-from matplotlib import pyplot as plt
-from sklearn import mixture
+from sklearn.mixture import GaussianMixture
+import matplotlib.pyplot as plt
+from sklearn import metrics
 
 
 # Filter to determine where an event occured
@@ -111,9 +112,9 @@ def gmodeHelp(x):
 def pos_group(row):
     x = row['map_group']
     g = ['GK']
-    d = ['CB', 'RB', 'LB', 'LWB', 'RWB']
+    d = ['CB']
     m = ['AM', 'CM', 'DM']
-    w = ['LM', 'RM', 'LW', 'RW']
+    w = ['LM', 'RM', 'LW', 'RW', 'RB', 'LB', 'LWB', 'RWB']
     f = ['FW']
     if x in g:
         return "GK"
@@ -122,7 +123,7 @@ def pos_group(row):
     elif x in m:
         return "MID"
     elif x in w:
-        return "WING"
+        return "WIDE"
     elif x in f:
         return "ATT"
     else:
@@ -134,8 +135,11 @@ def opt_clus(dr):
     aic_score = []
 
     for n in n_range:
-        gm = mixture.GaussianMixture(n_components=n, covariance_type='full', random_state=42)
+        gm = GaussianMixture(n_components=n, covariance_type='full', random_state=42)
         gm.fit(dr)
+        labels = gm.predict(dr)
+        labels = labels.reshape(labels.shape[0], 1)
+        print(("Clusters: ", n, "Siloutte: ", metrics.silhouette_score(dr, labels, metric='euclidean')))
         bic_score.append(gm.bic(dr))
         aic_score.append(gm.aic(dr))
 
@@ -147,6 +151,7 @@ def opt_clus(dr):
     ax.set_title('BIC and AIC Scores Per Number Of Clusters')
     ax.legend(fontsize='x-large')
     plt.show()
+
 
 def gmm_to_df(df):
     return pd.DataFrame(df.reshape(df.shape[0], 1), columns=["cluster"])
