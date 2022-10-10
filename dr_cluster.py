@@ -97,7 +97,7 @@ df_id_mid.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/MID
 df_id_wide.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/WIDE.csv', index=False)
 df_id_att.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/ATT.csv', index=False)
 
-# val-
+# val
 val = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/val.csv', sep=";", encoding='unicode_escape')
 frames = [df_id_def, df_id_mid, df_id_wide, df_id_att]
 val2 = pd.concat(frames)
