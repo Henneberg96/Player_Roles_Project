@@ -15,55 +15,55 @@ def findArea(row):
     if (x >= 0 and x <= 16 and y >= 0 and y <= 19):
         s = 1
     elif (x > 16 and x <= 33 and y >= 0 and y <= 19):
-        s = 2
-    elif (x > 33 and x <= 50 and y >= 0 and y <= 19):
-        s = 3
-    elif (x > 50 and x <= 67 and y >= 0 and y <= 19):
-        s = 4
-    elif (x > 67 and x <= 84 and y >= 0 and y <= 19):
         s = 5
+    elif (x > 33 and x <= 50 and y >= 0 and y <= 19):
+        s = 9
+    elif (x > 50 and x <= 67 and y >= 0 and y <= 19):
+        s = 15
+    elif (x > 67 and x <= 84 and y >= 0 and y <= 19):
+        s = 19
     elif (x > 84 and x <= 100 and y >= 0 and y <= 19):
-        s = 6
+        s = 24
     elif (x > 16 and x <= 33 and y > 19 and y <= 37):
         s = 7
     elif (x > 33 and x <= 50 and y > 19 and y <= 37):
-        s = 8
+        s = 11
     elif (x >= 50 and x <= 67 and y > 19 and y <= 37):
-        s = 9
+        s = 17
     elif (x > 67 and x <= 84 and y > 19 and y <= 37):
-        s = 10
+        s = 21
     elif (x > 16 and x <= 33 and y > 37 and y <= 63):
-        s = 12
+        s = 8
     elif (x > 33 and x <= 50 and y > 37 and y <= 63):
         s = 13
     elif (x > 50 and x <= 67 and y > 37 and y <= 63):
-        s = 14
-    elif (x > 67 and x <= 84 and y > 37 and y <= 63):
-        s = 15
-    elif (x > 16 and x <= 33 and y > 63 and y <= 81):
-        s = 17
-    elif (x > 33 and x <= 50 and y > 63 and y <= 81):
         s = 18
-    elif (x > 50 and x <= 67 and y > 63 and y <= 81):
-        s = 19
-    elif (x > 67 and x <= 84 and y > 63 and y <= 81):
-        s = 20
-    elif (x >= 0 and x <= 16 and y > 81 and y <= 100):
-        s = 21
-    elif (x > 16 and x <= 33 and y > 81 and y <= 100):
-        s = 22
-    elif (x > 33 and x <= 50 and y > 81 and y <= 100):
+    elif (x > 67 and x <= 84 and y > 37 and y <= 63):
         s = 23
-    elif (x > 50 and x <= 67 and y > 81 and y <= 100):
-        s = 24
-    elif (x > 67 and x <= 84 and y > 81 and y <= 100):
-        s = 25
-    elif (x > 84 and x <= 100 and y > 81 and y <= 100):
-        s = 26
-    elif (x >= 0 and x <= 16 and y > 19 and y <= 81):
-        s = 11
-    elif (x >= 84 and x <= 100 and y > 19 and y <= 81):
+    elif (x > 16 and x <= 33 and y > 63 and y <= 81):
+        s = 6
+    elif (x > 33 and x <= 50 and y > 63 and y <= 81):
+        s = 12
+    elif (x > 50 and x <= 67 and y > 63 and y <= 81):
         s = 16
+    elif (x > 67 and x <= 84 and y > 63 and y <= 81):
+        s = 22
+    elif (x >= 0 and x <= 16 and y > 81 and y <= 100):
+        s = 2
+    elif (x > 16 and x <= 33 and y > 81 and y <= 100):
+        s = 4
+    elif (x > 33 and x <= 50 and y > 81 and y <= 100):
+        s = 10
+    elif (x > 50 and x <= 67 and y > 81 and y <= 100):
+        s = 14
+    elif (x > 67 and x <= 84 and y > 81 and y <= 100):
+        s = 20
+    elif (x > 84 and x <= 100 and y > 81 and y <= 100):
+        s = 25
+    elif (x >= 0 and x <= 16 and y > 19 and y <= 81):
+        s = 3
+    elif (x >= 84 and x <= 100 and y > 19 and y <= 81):
+        s = 26
     else:
         s = 0
     return s
