@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from matplotlib import pyplot as plt
+from sklearn import mixture
 
 
 # Filter to determine where an event occured
@@ -65,7 +67,6 @@ def findArea(row):
         s = 0
     return s
 
-
 def ec(x1, x2, y1, y2):
     return np.sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2))
 
@@ -126,3 +127,26 @@ def pos_group(row):
         return "ATT"
     else:
         return "other"
+
+def opt_clus(dr):
+    n_range = range(2, 11)
+    bic_score = []
+    aic_score = []
+
+    for n in n_range:
+        gm = mixture.GaussianMixture(n_components=n, covariance_type='full', random_state=42)
+        gm.fit(dr)
+        bic_score.append(gm.bic(dr))
+        aic_score.append(gm.aic(dr))
+
+    fig, ax = plt.subplots(figsize=(12, 8), nrows=1)
+    ax.plot(n_range, bic_score, '-o', color='orange', label='BIC')
+    ax.plot(n_range, aic_score, '-o', color='blue', label='AIC')
+    ax.set(xlabel='Number of Clusters', ylabel='Score')
+    ax.set_xticks(n_range)
+    ax.set_title('BIC and AIC Scores Per Number Of Clusters')
+    ax.legend(fontsize='x-large')
+    plt.show()
+
+def gmm_to_df(df):
+    return pd.DataFrame(df.reshape(df.shape[0], 1), columns=["cluster"])

@@ -11,4 +11,3 @@ event_data = event_data[event_data.subEventName.notnull()]
 event_data['event_zone'] = event_data.apply(lambda row: findArea(row), axis=1)
 event_data.head(5)
 createPitchWithZones()
-
