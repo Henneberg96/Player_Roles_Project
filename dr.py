@@ -7,9 +7,13 @@ from helpers.helperFunctions import *
 import plotly.express as px
 
 # loading
-df = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_CN.csv',
-                 sep=",",
-                 encoding='unicode_escape')
+
+#Martin path
+#df = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_CN.csv', sep=",",encoding='unicode_escape')
+
+#Jesper Path
+df = pd.read_csv('C:/ITU/ITU_Research_Project/preprocessed/events_CN.csv', sep=",",encoding='unicode_escape')
+
 
 # creating data set
 df_id = df[['playerId', 'seasonId', 'map_group', 'pos_group']]

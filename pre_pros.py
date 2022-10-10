@@ -4,9 +4,11 @@ from sklearn.preprocessing import StandardScaler
 from helpers.helperFunctions import *
 
 # load event file
-df = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Events - Copy.csv',
-                 sep=";",
-                 encoding='unicode_escape')
+# Martin path
+#df = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Events - Copy.csv',   sep=";",  encoding='unicode_escape')
+
+#Jesper Path
+df = pd.read_csv('C:/ITU/ITU_Research_Project/WyScout_Data_Two/NewEvents/Wyscout_Events.csv',   sep=";",  encoding='unicode_escape')
 
 # drop first columns
 df.drop(columns=df.columns[0], axis=1, inplace=True)
@@ -64,9 +66,13 @@ df = df[df.subEventName != 'Whistle']
 df = df[df.playerId != 0]
 
 # merge with matches dataset to get season ID
-matches = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Matches.csv',
-                      sep=";",
-                      encoding='unicode_escape')
+
+#Martin path
+#matches = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Matches.csv',sep=";", encoding='unicode_escape')
+
+#Jesper Path
+matches = pd.read_csv('C:/ITU/ITU_Research_Project/WyScout_data_V2/Data/Wyscout_Matches.csv',sep=";", encoding='unicode_escape')
+
 df = pd.merge(df, matches, on='matchId')
 compInd = df.pop('competitionId')
 df.insert(5, 'competitionId', compInd, allow_duplicates=True)
