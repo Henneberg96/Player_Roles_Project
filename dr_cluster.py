@@ -7,7 +7,7 @@ from helpers.helperFunctions import *
 import plotly.express as px
 from sklearn.mixture import GaussianMixture
 
-# loading
+# loading v2
 df = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_CN_UMAP.csv',
                  sep=",",
                  encoding='unicode_escape')
