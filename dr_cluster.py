@@ -32,22 +32,22 @@ df_id_wide = df_id[df_id.pos_group == 'WIDE']
 df_id_att = df_id[df_id.pos_group == 'ATT']
 
 # applying UMAP - remember to install pynndescent to make it run faster
-dr_def = umap.UMAP(n_neighbors=60, min_dist=0.0, n_components=2, random_state=42).fit_transform(df_def)
-dr_mid = umap.UMAP(n_neighbors=60, min_dist=0.0, n_components=2, random_state=42).fit_transform(df_mid)
-dr_wide = umap.UMAP(n_neighbors=60, min_dist=0.0, n_components=2, random_state=42).fit_transform(df_wide)
-dr_att = umap.UMAP(n_neighbors=60, min_dist=0.0, n_components=2, random_state=42).fit_transform(df_att)
+dr_def = umap.UMAP(n_neighbors=80, min_dist=0.0, n_components=3, random_state=42).fit_transform(df_def)
+dr_mid = umap.UMAP(n_neighbors=80, min_dist=0.0, n_components=3, random_state=42).fit_transform(df_mid)
+dr_wide = umap.UMAP(n_neighbors=80, min_dist=0.0, n_components=3, random_state=42).fit_transform(df_wide)
+dr_att = umap.UMAP(n_neighbors=80, min_dist=0.0, n_components=3, random_state=42).fit_transform(df_att)
 
 # when n_components=2
-dr2 = pd.DataFrame(dr_def, columns=["x", "y"])
-dr2 = df_id_def.join(dr2)
-plot = sns.scatterplot(data=dr2, x="x", y="y", hue = "map_group")
-plt.show()
+# dr2 = pd.DataFrame(dr_wide, columns=["x", "y"])
+# dr2 = df_id_wide.join(dr2)
+# plot = sns.scatterplot(data=dr2, x="x", y="y", hue = "map_group")
+# plt.show()
 
 # when n_components=3
-# dr2 = pd.DataFrame(dr_att, columns=["x", "y", "z"])
-# dr2 = pd.merge(df_id_def, dr2, left_index=True, right_index=True)
-# fig = px.scatter_3d(dr2, x='x', y='y', z='z', color='map_group')
-# fig.show()
+dr2 = pd.DataFrame(dr_att, columns=["x", "y", "z"])
+dr2 = pd.merge(df_id_def, dr2, left_index=True, right_index=True)
+fig = px.scatter_3d(dr2, x='x', y='y', z='z', color='map_group')
+fig.show()
 
 # optimal GMM model
 opt_clus(dr_def)
@@ -56,24 +56,28 @@ opt_clus(dr_wide)
 opt_clus(dr_att)
 
 # visualizing defenders
-gmm_def = GaussianMixture(n_components=8, covariance_type='full', random_state=42).fit(dr_def).predict(dr_def)
-plt.scatter(dr_def[:, 0], dr_def[:, 1], c=gmm_def, s=40, cmap='viridis')
-plt.show()
+gmm_def = GaussianMixture(n_components=4, covariance_type='full', random_state=42).fit(dr_def).predict(dr_def)
+# plt.scatter(dr_def[:, 0], dr_def[:, 1], c=gmm_def, s=40, cmap='viridis')
+fig = px.scatter_3d(x=dr_def[:, 0], y=dr_def[:, 1], z=dr_def[:, 2], color=gmm_def)
+fig.show()
 
 # visualizing midfielders
-gmm_mid = GaussianMixture(n_components=5, covariance_type='full', random_state=42).fit(dr_mid).predict(dr_mid)
-plt.scatter(dr_mid[:, 0], dr_mid[:, 1], c=gmm_mid, s=40, cmap='viridis')
-plt.show()
+gmm_mid = GaussianMixture(n_components=8, covariance_type='full', random_state=42).fit(dr_mid).predict(dr_mid)
+# plt.scatter(dr_mid[:, 0], dr_mid[:, 1], c=gmm_mid, s=40, cmap='viridis')
+fig = px.scatter_3d(x=dr_mid[:, 0], y=dr_mid[:, 1], z=dr_mid[:, 2], color=gmm_mid)
+fig.show()
 
 # visualizing wide players
-gmm_wide = GaussianMixture(n_components=4, covariance_type='full', random_state=42).fit(dr_wide).predict(dr_wide)
-plt.scatter(dr_wide[:, 0], dr_wide[:, 1], c=gmm_wide, s=40, cmap='viridis')
-plt.show()
+gmm_wide = GaussianMixture(n_components=7, covariance_type='full', random_state=42).fit(dr_wide).predict(dr_wide)
+# plt.scatter(dr_wide[:, 0], dr_wide[:, 1], c=gmm_wide, s=40, cmap='viridis')
+fig = px.scatter_3d(x=dr_wide[:, 0], y=dr_wide[:, 1], z=dr_wide[:, 2], color=gmm_wide)
+fig.show()
 
 # visualizing attackers
-gmm_att = GaussianMixture(n_components=6, covariance_type='full', random_state=42).fit(dr_att).predict(dr_att)
-plt.scatter(dr_att[:, 0], dr_att[:, 1], c=gmm_att, s=40, cmap='viridis')
-plt.show()
+gmm_att = GaussianMixture(n_components=5, covariance_type='full', random_state=42).fit(dr_att).predict(dr_att)
+# plt.scatter(dr_att[:, 0], dr_att[:, 1], c=gmm_att, s=40, cmap='viridis')
+fig = px.scatter_3d(x=dr_att[:, 0], y=dr_att[:, 1], z=dr_att[:, 2], color=gmm_att)
+fig.show()
 
 # merging into df
 df_id_def = pd.concat([df_id_def.reset_index(drop=True),gmm_to_df(gmm_def).reset_index(drop=True)], axis=1)
