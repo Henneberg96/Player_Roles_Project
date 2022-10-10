@@ -68,7 +68,6 @@ def findArea(row):
         s = 0
     return s
 
-
 def ec(x1, x2, y1, y2):
     return np.sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2))
 
@@ -129,7 +128,6 @@ def pos_group(row):
         return "ATT"
     else:
         return "other"
-
 
 def opt_clus(dr):
     n_range = range(2, 11)
