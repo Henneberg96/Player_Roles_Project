@@ -201,31 +201,36 @@ minutes.pop('position')
 minutes = minutes.groupby(['playerId', 'seasonId'], as_index=False).sum()
 dfc = pd.merge(dfc, minutes, on=['playerId', 'seasonId'])
 
-# normalizing with per 90
+# merging with passes
+passes = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/passes.csv',
+                 sep=",",
+                 encoding='unicode_escape')
+passes = passes[['playerId', 'seasonId']]
+passes['counts'] = 1.0
+passes = passes.groupby(['playerId', 'seasonId'], as_index=False).sum()
+
+# normalizing with per 90 and per pass
 dfc = dfc[dfc.time > 900] # cutoff minutes
 dfc['games'] = dfc['time'] / 90
 df_id = dfc.iloc[:, np.r_[0, 1]]
 df_norm = dfc.iloc[:, np.r_[0, 1, 2:83, 156]]
-df_none = dfc.iloc[:, np.r_[0, 1, 84:154]]
+df_none = dfc.iloc[:, np.r_[0, 1, 84:155]]
 
-df_norm = df_norm.iloc[:,2:83].div(df_norm.games, axis=0)
+df_norm = pd.merge(df_norm, passes, on=['playerId', 'seasonId'])
+df_norm = df_norm.iloc[:,2:83].div(df_norm.games, axis=0).div(df_norm.counts, axis=0)
+df_norm = pd.concat([df_id.reset_index(drop=True),df_norm.reset_index(drop=True)], axis=1)
 
-dfn = pd.merge(df_id, df_norm, left_index=True, right_index=True)
-dfn = pd.merge(dfn, df_none, on=['playerId', 'seasonId'])
-
-# moving teamId to the front
-tId = dfn.pop('teamId')
-dfn.insert(2, 'teamId', tId, allow_duplicates=True)
+dfn = pd.merge(df_none, df_norm, on=['playerId', 'seasonId'])
 
 # further normalization - scaling
 scale = RobustScaler()
 dfn.replace([np.inf, -np.inf], 0, inplace=True)
 dfn_id = dfn.iloc[:, np.r_[0:3]]
-dfn_scale = dfn.iloc[:, np.r_[3:153]]
+dfn_scale = dfn.iloc[:, np.r_[3:154]]
 dfn_scaled = dfn_scale.copy()
 
 dfn_scaled[dfn_scaled.columns] = scale.fit_transform(dfn_scaled[dfn_scaled.columns])
-dfn = pd.merge(dfn_id, dfn_scaled, left_index=True, right_index=True)
+dfn = pd.concat([dfn_id.reset_index(drop=True),dfn_scaled.reset_index(drop=True)], axis=1)
 
 # starting position merging and cleaning - saving IDs and merging with positions
 pos = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Positions_Minutes.csv', sep=";", encoding='unicode_escape')

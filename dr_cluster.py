@@ -13,17 +13,17 @@ df = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/eve
                  encoding='unicode_escape')
 
 # creating data set
-df_id = df[['playerId', 'seasonId', 'map_group', 'pos_group']]
+df_id = df[['playerId', 'seasonId', 'teamId', 'map_group', 'pos_group']]
 df_def = df[df.pos_group == 'DEF']
 df_mid = df[df.pos_group == 'MID']
 df_wide = df[df.pos_group == 'WIDE']
 df_att = df[df.pos_group == 'ATT']
 
 # dropping the ids
-df_def = df_def.drop(['playerId', 'seasonId', 'map_group', 'pos_group'], axis=1)
-df_mid = df_mid.drop(['playerId', 'seasonId', 'map_group', 'pos_group'], axis=1)
-df_wide = df_wide.drop(['playerId', 'seasonId', 'map_group', 'pos_group'], axis=1)
-df_att = df_att.drop(['playerId', 'seasonId', 'map_group', 'pos_group'], axis=1)
+df_def = df_def.drop(['playerId', 'seasonId', 'teamId', 'map_group', 'pos_group'], axis=1)
+df_mid = df_mid.drop(['playerId', 'seasonId', 'teamId', 'map_group', 'pos_group'], axis=1)
+df_wide = df_wide.drop(['playerId', 'seasonId', 'teamId', 'map_group', 'pos_group'], axis=1)
+df_att = df_att.drop(['playerId', 'seasonId', 'teamId', 'map_group', 'pos_group'], axis=1)
 
 # getting IDs for map visualization
 df_id_def = df_id[df_id.pos_group == 'DEF']
@@ -44,8 +44,8 @@ dr_att = umap.UMAP(n_neighbors=80, min_dist=0.0, n_components=3, random_state=42
 # plt.show()
 
 # when n_components=3
-dr2 = pd.DataFrame(dr_att, columns=["x", "y", "z"])
-dr2 = pd.merge(df_id_def, dr2, left_index=True, right_index=True)
+dr2 = pd.DataFrame(dr_mid, columns=["x", "y", "z"])
+dr2 = pd.merge(df_id_mid, dr2, left_index=True, right_index=True)
 fig = px.scatter_3d(dr2, x='x', y='y', z='z', color='map_group')
 fig.show()
 
@@ -62,7 +62,7 @@ fig = px.scatter_3d(x=dr_def[:, 0], y=dr_def[:, 1], z=dr_def[:, 2], color=gmm_de
 fig.show()
 
 # visualizing midfielders
-gmm_mid = GaussianMixture(n_components=8, covariance_type='full', random_state=42).fit(dr_mid).predict(dr_mid)
+gmm_mid = GaussianMixture(n_components=6, covariance_type='full', random_state=42).fit(dr_mid).predict(dr_mid)
 # plt.scatter(dr_mid[:, 0], dr_mid[:, 1], c=gmm_mid, s=40, cmap='viridis')
 fig = px.scatter_3d(x=dr_mid[:, 0], y=dr_mid[:, 1], z=dr_mid[:, 2], color=gmm_mid)
 fig.show()
