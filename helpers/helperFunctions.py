@@ -130,7 +130,7 @@ def pos_group(row):
         return "other"
 
 def opt_clus(dr):
-    n_range = range(2, 11)
+    n_range = range(2, 21)
     bic_score = []
     aic_score = []
 
@@ -138,7 +138,7 @@ def opt_clus(dr):
         gm = GaussianMixture(n_components=n, covariance_type='full', random_state=42)
         gm.fit(dr)
         labels = gm.predict(dr)
-        labels = labels.reshape(labels.shape[0], 1)
+        #labels = labels.reshape(labels.shape[0], 1) # for 3D
         print(("Clusters: ", n, "Siloutte: ", metrics.silhouette_score(dr, labels, metric='euclidean')))
         bic_score.append(gm.bic(dr))
         aic_score.append(gm.aic(dr))
@@ -153,5 +153,18 @@ def opt_clus(dr):
     plt.show()
 
 
-def gmm_to_df(df):
-    return pd.DataFrame(df.reshape(df.shape[0], 1), columns=["cluster"])
+def gmm_to_df(df, phase):
+    if phase == 'ip':
+        frame = pd.DataFrame(df.reshape(df.shape[0], 1), columns=["ip_cluster"])
+    elif phase == 'op':
+        frame = pd.DataFrame(df.reshape(df.shape[0], 1), columns=["op_cluster"])
+    return frame
+
+
+# Identifying highly correlated features
+def find_outliers_IQR(df):
+   q1=df.quantile(0.25)
+   q3=df.quantile(0.75)
+   IQR=q3-q1
+   outliers = df[((df<(q1-1.5*IQR)) | (df>(q3+1.5*IQR)))]
+   return outliers
