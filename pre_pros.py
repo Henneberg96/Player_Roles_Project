@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import MinMaxScaler
 from helpers.helperFunctions import *
 
 # load event file
@@ -210,7 +210,7 @@ passes['counts'] = 1.0
 passes = passes.groupby(['playerId', 'seasonId'], as_index=False).sum()
 
 # normalizing with per 90 and per pass
-dfc = dfc[dfc.time > 900] # cutoff minutes
+dfc = dfc[dfc.time > 720] # cutoff minutes
 dfc['games'] = dfc['time'] / 90
 df_id = dfc.iloc[:, np.r_[0, 1]]
 df_norm = dfc.iloc[:, np.r_[0, 1, 2:83, 156]]
@@ -222,15 +222,8 @@ df_norm = pd.concat([df_id.reset_index(drop=True),df_norm.reset_index(drop=True)
 
 dfn = pd.merge(df_none, df_norm, on=['playerId', 'seasonId'])
 
-# further normalization - scaling
-scale = RobustScaler()
-dfn.replace([np.inf, -np.inf], 0, inplace=True)
-dfn_id = dfn.iloc[:, np.r_[0:3]]
-dfn_scale = dfn.iloc[:, np.r_[3:154]]
-dfn_scaled = dfn_scale.copy()
-
-dfn_scaled[dfn_scaled.columns] = scale.fit_transform(dfn_scaled[dfn_scaled.columns])
-dfn = pd.concat([dfn_id.reset_index(drop=True),dfn_scaled.reset_index(drop=True)], axis=1)
+# filling nan
+dfn = dfn.fillna(0)
 
 # starting position merging and cleaning - saving IDs and merging with positions
 pos = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Positions_Minutes.csv', sep=";", encoding='unicode_escape')
@@ -250,6 +243,17 @@ dfn = dfn[dfn.map_group != 'GK']
 nan_check = pd.DataFrame(dfn.isna().sum())
 dfn_pos = dfn[['playerId', 'seasonId', "map_group", "pos_group"]]
 
+# further normalization - scaling
+scale = MinMaxScaler()
+dfn.replace([np.inf, -np.inf], 0, inplace=True)
+dfn_id = dfn.iloc[:, np.r_[0:3, 154:156]]
+dfn_scale = dfn.iloc[:, np.r_[3:154]]
+dfn_scaled = dfn_scale.copy()
+
+dfn_scaled[dfn_scaled.columns] = scale.fit_transform(dfn_scaled[dfn_scaled.columns])
+check = dfn_scaled.describe()
+dfn = pd.concat([dfn_id.reset_index(drop=True),dfn_scaled.reset_index(drop=True)], axis=1)
+
 # removing unwanted columns - accurate stats (duplicate), goalkeeper stats, irrelevant zones, irrelevant accuracy %, irrelevant stats for a player's role (not necessarily clustering)
 dfn = dfn.drop(['Simple pass_acc', 'Clearance_acc', 'Air duel_acc', 'Cross_acc', 'Launch_acc', 'Ground attacking duel_acc', 'Head pass_acc', 'Ground loose ball duel_acc', 'Ground defending duel_acc', 'Free Kick_acc', 'High pass_acc', 'Throw in_acc', 'Smart pass_acc', 'Free kick cross_acc', 'Save attempt_acc', 'Acceleration_acc', 'Corner_acc', 'Shot_acc', 'Reflexes_acc', 'Hand pass_acc', 'Free kick shot_acc', 'Penalty_acc',
               'Goal kick', 'Goalkeeper leaving line', 'Hand pass', 'Reflexes', 'Save attempt',
@@ -258,17 +262,20 @@ dfn = dfn.drop(['Simple pass_acc', 'Clearance_acc', 'Air duel_acc', 'Cross_acc',
                 'own_goal', 'Ball out of the field', 'Hand foul', 'Out of game foul', 'Protest', 'Simulation', 'Throw in', 'Time lost foul', 'Launch', 'Launch_zone', 'Launch_acc_percentage', 'head', 'feint', 'Touch', 'Touch_zone', 'Clearance_acc_percentage'],
              axis=1)
 
-# filling nan
-dfn = dfn.fillna(0)
-
-# exporting pre UMAP file
-dfn.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_CN.csv', index=False)
-
 # removing unwanted columns for UMAP - assigned stats (pen, free-kick, corners)
 dfn = dfn.drop(['Penalty', 'Penalty_acc_percentage',
                 'Free kick shot', 'Free kick shot_acc_percentage', 'Free kick cross', 'Free kick cross_acc_percentage', 'Free Kick', 'Free Kick_acc_percentage',
                 'Corner', 'Corner_acc_percentage'],
              axis=1)
+
+# outliers
+outliers = find_outliers_IQR(dfn)
+check = outliers.describe()
+dfn = dfn.drop(['Shot_zone', 'Offside_zone', 'shot_distance',
+              'Simple pass_zone', 'Clearance_zone', 'Air duel_zone', 'Cross_zone', 'Ground attacking duel_zone', 'Head pass_zone', 'Ground loose ball duel_zone', 'Ground defending duel_zone', 'High pass_zone', 'Smart pass_zone', 'Foul_zone', 'Acceleration_zone',
+                'cross_distance', 'Acceleration_acc_percentage', 'counter_opportunity_ratio', 'missed_ball', 'Offside'], axis=1)
+
+check = dfn.describe()
 
 # exporting UMAP formatted file
 dfn.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_CN_UMAP.csv', index=False)
