@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from helpers.helperFunctions import findArea
 from helpers.visualizations import createPitchWithZones
+from helpers.helperFunctions import loadData
+
 import matplotlib.pyplot as plt
 from mplsoccer import Pitch
 

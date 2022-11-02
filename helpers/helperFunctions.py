@@ -1,9 +1,8 @@
-import pandas as pd
-import numpy as np
-from sklearn.mixture import GaussianMixture
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from sklearn import metrics
-
+from sklearn.mixture import GaussianMixture
 
 # Filter to determine where an event occured
 def findArea(row):
@@ -155,3 +154,5 @@ def opt_clus(dr):
 
 def gmm_to_df(df):
     return pd.DataFrame(df.reshape(df.shape[0], 1), columns=["cluster"])
+
+

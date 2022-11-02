@@ -1,17 +1,192 @@
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.offline as pyo
+from helpers.metrics import *
+
+#Unused imports
+'''
 import numpy as np
 import matplotlib.pyplot as plt
 from mplsoccer import Pitch
+import seaborn as sns
+import plotly.express as px
+'''
 
-#Define pitch with predeefiend rows
+
+# --------------------------------------------------------
+# Define pitch with predeefiend rows
+
+# Get individuals scores in subcategories
+data = pd.read_csv("C:/ITU/ITU_Research_Project/clustered_data/clusters_possesione_format.csv", sep = ",", encoding='unicode_escape')
+
+#Function to produce averages for each cluster for specified values in arguemnt
+def get_stat_values (data, metric):
+    clusters = data.ip_cluster.unique()
+    final_frame = pd.DataFrame()
+    data = data[metric]
+    for cluster in clusters:
+        cluster_frame = data[data['ip_cluster'] == cluster]
+        frame = cluster_frame.loc[:, cluster_frame.columns != 'ip_cluster']
+        transposed = frame.T
+        transposed['vals'] = transposed.mean(axis =1)
+        transposed['ip_cluster'] = cluster
+        vals_clusters = transposed[['vals', 'ip_cluster']]
+        vals_clusters_labels = vals_clusters.rename_axis("labels").reset_index()
+        vals_clusters_labels.columns.values[0] = "labels"
+        final_frame = pd.concat([final_frame, vals_clusters_labels])
+    return final_frame
+
+
+#Function to create spiderweb plot for spcified stats
+def make_spider_web(raw_data, stat, title_att):
+  stat_vals = get_stat_values(raw_data, stat)
+  clusters = stat_vals.ip_cluster.unique()
+  clusters.sort()
+
+  fig = go.Figure(layout=go.Layout(
+      title=go.layout.Title(text='Comparison clusters - ' + title_att ),
+      polar={'radialaxis': {'visible': True}},
+      showlegend=True
+  ))
+
+  for cluster in clusters:
+      cluster_df = stat_vals[stat_vals['ip_cluster'] == cluster]
+      frame = cluster_df.loc[:, cluster_df.columns != 'ip_cluster']
+      fig.add_trace(
+          go.Scatterpolar(r=frame.vals, theta=frame.labels, name="# Cluster " + str(cluster)),
+      )
+  pyo.plot(fig)
+
+#Plotting spiderwebs
+make_spider_web(data, progression, "Progression")
+make_spider_web(data, finishing, "Finishing")
+make_spider_web(data, established, "Established")
+make_spider_web(data, movement, "Movement")
+make_spider_web(data, creating, "Creating")
+
+#-------------------------------------- Unused code atm ----------------------------------------------#
+
+#Not used at, kept in case of potential future usage
+
+'''
+def get_cluster_scores(data):
+   DEF_score = (data[(data.labels == 'ground_duels') | (data.labels == 'air_duels') | (data.labels == 'clearance') | (data.labels == 'game_reading') | (data.labels == 'disciplinary')]).groupby(['cluster']).sum()
+   DEF_score['labels'] = "DEF"
+   #DEF_score.index.name = 'cluster'
+   #DEF_score.reset_index(inplace=True)
+
+   POS_score = (data[ (data.labels == 'misc') | (data.labels == 'progression') | (data.labels == 'established')]).groupby(['cluster']).sum()
+   POS_score['labels'] = "POS"
+  # DEF_score.index.name = 'cluster'
+   #DEF_score.reset_index(inplace=True)
+
+   ATT_score = (data[(data.labels == 'finishing') | (data.labels == 'movement') | (data.labels == 'creating')]).groupby(['cluster']).sum()
+   ATT_score['labels'] = "ATT"
+#  DEF_score.index.name = 'cluster'
+#  DEF_score.reset_index(inplace=True)
+
+   list_of_frames = [DEF_score, POS_score, ATT_score]
+   df_final = pd.concat(list_of_frames)
+
+   df_final.index.name = 'cluster'
+   df_final.reset_index(inplace=True)
+
+   return df_final
+def getdata():
+    DEF = pd.read_csv('C:/ITU/ITU_Research_Project/clustered_data/DEF.csv', sep=",", encoding='unicode_escape')
+    MID = pd.read_csv('C:/ITU/ITU_Research_Project/clustered_data/MID.csv', sep=",", encoding='unicode_escape')
+    WIDE = pd.read_csv('C:/ITU/ITU_Research_Project/clustered_data/WIDE.csv', sep=",", encoding='unicode_escape')
+    ATT = pd.read_csv('C:/ITU/ITU_Research_Project/clustered_data/ATT.csv', sep=",", encoding='unicode_escape')
+    raw = pd.read_csv("C:/ITU/ITU_Research_Project/preprocessed/events_CN.csv", sep=",", encoding='unicode_escape')
+
+    DEF_v2 = pd.merge(DEF, raw, on=['playerId', 'seasonId', 'map_group', 'pos_group'])
+    MID_v2 = pd.merge(MID, raw, on=['playerId', 'seasonId', 'map_group', 'pos_group'])
+    WIDE_v2 = pd.merge(WIDE, raw, on=['playerId', 'seasonId', 'map_group', 'pos_group'])
+    ATT_v2 = pd.merge(ATT, raw, on=['playerId', 'seasonId', 'map_group', 'pos_group'])
+
+    DEF_v3 = DEF_v2.drop(['playerId', 'seasonId', 'map_group', 'pos_group', 'teamId'], axis=1)
+    MID_v3 = MID_v2.drop(['playerId', 'seasonId', 'map_group', 'pos_group', 'teamId'], axis=1)
+    ATT_v3 = ATT_v2.drop(['playerId', 'seasonId', 'map_group', 'pos_group', 'teamId'], axis=1)
+    WIDE_v3 = WIDE_v2.drop(['playerId', 'seasonId', 'map_group', 'pos_group', 'teamId'], axis=1)
+
+    return DEF_v3, MID_v3, WIDE_v3, ATT_v3
+def get_cluster_sub_scores(data):
+    clusters = data.cluster.unique()
+    final_frame = pd.DataFrame()
+    for cluster in clusters:
+        cluster_frame = data[data['cluster'] == cluster]
+        vals = get_scores(cluster_frame)
+        frame_made = pd.DataFrame((((pd.DataFrame.from_records(vals)).sum())))
+        frame_made = frame_made.rename_axis("labels").reset_index()
+        frame_made.columns.values[1] = "values"
+        frame_made['cluster'] = cluster
+        final_frame = pd.concat([final_frame, frame_made])
+
+    return final_frame
+def get_scores(cluster_frame):
+    def_scores = {'ground_duels': cluster_frame[ground_duels].sum().sum(),
+                  'air_duels': cluster_frame[air_duels].sum().sum(),
+                  'clearance': cluster_frame[clearance].sum().sum(),
+                  'game_reading': cluster_frame[game_reading].sum().sum(),
+                  'disciplinary': cluster_frame[disciplinary].sum().sum(),
+                  }
+
+    pos_scores = {'established': cluster_frame[established].sum().sum(),
+                  'progression': cluster_frame[progression].sum().sum(),
+                  'misc': cluster_frame[misc].sum().sum(),
+                  }
+
+    att_scores = {'finishing': cluster_frame[finishing].sum().sum(),
+                  'creating': cluster_frame[creating].sum().sum(),
+                  'movement': cluster_frame[movement].sum().sum(),
+                  }
+    return def_scores, pos_scores, att_scores
+
+
+# Extract data on each position group
+DEF, MID, WIDE, ATT = getdata()
+
+df = pd.DataFrame(dict(
+    r=[1, 5, 2, 2, 3],
+    theta=['processing cost','mechanical properties','chemical stability',
+           'thermal stability', 'device integration']))
+
+fig = px.line_polar(df, r='r', theta=finishing, line_close=True)
+fig.show()
+
+
+
+# Get summarized sub scores for each cluster divided by positional groups
+def_sub_scores_per_cluster = get_cluster_sub_scores(DEF)
+
+mid_sub_scores_per_cluster = get_cluster_sub_scores(MID)
+wide_sub_scores_per_cluster = get_cluster_sub_scores(WIDE)
+att_sub_scores_per_cluster = get_cluster_sub_scores(ATT)
+
+def_scores = get_cluster_scores(def_sub_scores_per_cluster)
+mid_scores = get_cluster_scores(mid_sub_scores_per_cluster)
+wide_scores = get_cluster_scores(wide_sub_scores_per_cluster)
+att_scores = get_cluster_scores(att_sub_scores_per_cluster)
+
+sns.barplot(data=def_scores, x="labels", y="values")
+plt.show()
+
+sns.kdeplot(data=df1, x="values")
+plt.show()
+
+
+sns.barplot(data=def_scores, x="labels", y="values", hue='cluster')
+plt.show()
+
 def createPitchWithZones():
     data = np.array([
         [0, 0],
-        [16,0], # x+16
+        [16, 0],  # x+16
         [0, 19],
-        [16, 19], # x+17
+        [16, 19],  # x+17
         [33, 0],
         [33, 19],
-        [67, 0], # x+34
+        [67, 0],  # x+34
         [67, 19],
         [84, 0],
         [84, 19],
@@ -44,20 +219,13 @@ def createPitchWithZones():
         [50, 100],
         [67, 37],
         [84, 37],
-        [84, 63],])
+        [84, 63], ])
     pitch = Pitch(pitch_type='wyscout', axis=True,
                   positional=True,
                   tick=True,
                   label=True)
     fig, ax = pitch.draw()
     x, y = data.T
-    plt.scatter(x,y)
+    plt.scatter(x, y)
     plt.show()
-
-#Draw customized polygons
-#shape1 = np.array([[0, 0], [50, 0], [50, 50], [0, 50]])
-#shape2 = np.array([[0, 50], [50, 50], [50, 100], [0, 100]])
-#shape3 = np.array([[50, 0], [100, 0], [100, 50], [50, 50]])
-#shape4 = np.array([[50, 50], [100, 50], [100, 100], [50, 100]])
-#areas = [shape1, shape2, shape3, shape4]
-#pitch.polygon(areas , edgecolor='black', fc=[1, 0, 0], alpha=0.3, ax=ax)
+'''
