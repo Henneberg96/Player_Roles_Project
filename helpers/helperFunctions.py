@@ -129,6 +129,18 @@ def pos_group(row):
     else:
         return "other"
 
+
+def off_def(row):
+    x = row['map_group']
+    off = ['FW', 'LM', 'RM', 'LW', 'RW', 'AM', 'CM']
+    deff = ['CB', 'RB', 'LB', 'LWB', 'RWB', 'DM']
+    if x in off:
+        return "off"
+    elif x in deff:
+        return "def"
+    else:
+        return "other"
+
 def opt_clus(dr):
     n_range = range(2, 21)
     bic_score = []
