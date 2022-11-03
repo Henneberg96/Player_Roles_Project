@@ -19,7 +19,7 @@ import plotly.express as px
 
 # Get individuals scores in subcategories
 data = pd.read_csv("C:/ITU/ITU_Research_Project/clustered_data/clusters.csv", sep = ",", encoding='unicode_escape')
-data = pd.read_csv("C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/clusters.csv", sep = ",", encoding='unicode_escape')
+#data = pd.read_csv("C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/clusters.csv", sep = ",", encoding='unicode_escape')
 
 #Function to produce averages for each cluster for specified values in arguemnt
 def get_stat_values (data, metric):
@@ -38,10 +38,21 @@ def get_stat_values (data, metric):
         final_frame = pd.concat([final_frame, vals_clusters_labels])
     return final_frame
 
+#Sum scores per key in dict per player
+def compute_sum_per_metric(data, dict):
+    for key, val in dict.items():
+        val.remove('ip_cluster')
+        data[key] = data[val].sum(axis=1)
+    return data
+
+
+data = compute_sum_per_metric(data, dict_lists)
+
+
+
 def get_avg(df):
     averages = pd.DataFrame(columns=['labels', 'vals'])
     labels = df.labels.unique()
-    g = df[df['labels'] == 'progressive_passes']
     for label in labels:
         label_df = df[df['labels'] == label]
         avg_df = label_df['vals'].mean()
@@ -52,13 +63,10 @@ def get_avg(df):
 
 
 
-
-
 #Function to create spiderweb plot for spcified stats
 def make_spider_web(raw_data, stat, title_att):
   stat_vals = get_stat_values(raw_data, stat)
   averages_found = get_avg(stat_vals)
- # averages_found['ip_clusters'] =
   clusters = stat_vals.ip_cluster.unique()
   avg_cluster = max(clusters) +1
   averages_found['ip_cluster'] = avg_cluster
@@ -80,8 +88,10 @@ def make_spider_web(raw_data, stat, title_att):
       fig.add_trace(
           go.Scatterpolar(r=frame.vals, fill='toself', opacity=0.4, theta=frame.labels, name="# Cluster " + str(cluster)),
       )
+
   pyo.plot(fig)
 
+#Spider web with closed lines
 def make_spider_web_v2(raw_data, stat, title_att):
       stat_vals = get_stat_values(raw_data, stat)
       df_visual = get_avg(stat_vals)
@@ -89,8 +99,6 @@ def make_spider_web_v2(raw_data, stat, title_att):
       clusters = stat_vals.ip_cluster.unique()
       df_visual['cluster'] = 'AVG'
       clusters.sort()
-      print(df_visual)
-
       for cluster in clusters:
           cluster_df = stat_vals[stat_vals['ip_cluster'] == cluster]
           frame = cluster_df.loc[:, cluster_df.columns != 'ip_cluster']
@@ -102,6 +110,7 @@ def make_spider_web_v2(raw_data, stat, title_att):
       fig.show()
       pyo.plot(fig)
 
+
 #Plotting spiderwebs
 make_spider_web(data, finishing, "Finishing")
 make_spider_web(data, creating, "Creating")
@@ -109,7 +118,7 @@ make_spider_web(data, progression, "Progression")
 make_spider_web(data, established, "Established")
 make_spider_web(data, duels, "Duels")
 make_spider_web(data, game_reading, "Game Reading")
-make_spider_web(data, overall_accuracy, "Accuracy")
+make_spider_web(data, categories, "Categories")
 
 
 #-------------------------------------- Unused code atm ----------------------------------------------#

@@ -1,4 +1,3 @@
-# DEFENDING ATTRIBUTES -------------------------------------
 duels = [
     "sliding_tackle",
     "slide_tackle_ratio",
