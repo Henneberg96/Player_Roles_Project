@@ -180,3 +180,13 @@ def find_outliers_IQR(df):
    IQR=q3-q1
    outliers = df[((df<(q1-1.5*IQR)) | (df>(q3+1.5*IQR)))]
    return outliers
+
+
+def names_clusters(data, cluster):
+    df = data.iloc[:, np.r_[0, 5, 6:12]]
+    players = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Players.csv', sep=";", encoding='unicode_escape')
+    players.drop(columns=players.columns[0], axis=1, inplace=True)
+    dfp = pd.merge(players, df, on='playerId')
+    dfp = dfp[dfp.ip_cluster == cluster]
+    dfp = dfp.iloc[:, np.r_[4, 2, 1, 18, 17, 15, 16, 13, 14]]
+    return dfp

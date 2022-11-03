@@ -3,6 +3,8 @@ import plotly.graph_objects as go
 import plotly.offline as pyo
 from helpers.metrics import *
 import plotly.express as px
+import numpy as np
+from helpers.helperFunctions import *
 
 #Unused imports
 '''
@@ -19,7 +21,7 @@ import plotly.express as px
 
 # Get individuals scores in subcategories
 data = pd.read_csv("C:/ITU/ITU_Research_Project/clustered_data/clusters.csv", sep = ",", encoding='unicode_escape')
-#data = pd.read_csv("C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/clusters.csv", sep = ",", encoding='unicode_escape')
+data = pd.read_csv("C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/clusters.csv", sep = ",", encoding='unicode_escape')
 
 #Function to produce averages for each cluster for specified values in arguemnt
 def get_stat_values (data, metric):
@@ -109,6 +111,17 @@ def make_spider_web_v2(raw_data, stat, title_att):
                           template="plotly_dark", )
       fig.show()
 
+# getting percentiles
+ids = data.iloc[:, np.r_[0:6]]
+test = data.iloc[:, np.r_[6:58]]
+test = test.rank(pct = True)
+test = pd.concat([ids.reset_index(drop=True),test.reset_index(drop=True)], axis=1)
+test = compute_sum_per_metric(test, dict_lists)
+
+
+test = data.iloc[:, np.r_[58:64]]
+test = test.rank(pct = True)
+test = pd.concat([ids.reset_index(drop=True),test.reset_index(drop=True)], axis=1)
 
 #Plotting spiderwebs
 make_spider_web(data, finishing, "Finishing")
@@ -117,8 +130,14 @@ make_spider_web(data, progression, "Progression")
 make_spider_web(data, established, "Established")
 make_spider_web(data, duels, "Duels")
 make_spider_web(data, game_reading, "Game Reading")
-make_spider_web(data, categories, "Categories")
+make_spider_web(test, categories, "Categories")
 
+# validate clusters
+xyz = names_clusters(test, 1)
+val = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/val.csv', sep=";", encoding='unicode_escape')
+xyz = data.iloc[:, np.r_[0, 5]]
+val_df = pd.merge(val, xyz, on='playerId')
+val_df.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/valDF.csv', index=False)
 
 #-------------------------------------- Unused code atm ----------------------------------------------#
 
