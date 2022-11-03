@@ -41,10 +41,10 @@ def get_stat_values (data, metric):
 #Sum scores per key in dict per player
 def compute_sum_per_metric(data, dict):
     for key, val in dict.items():
-        val.remove('ip_cluster')
-        data[key] = data[val].sum(axis=1)
+        h = val
+        h.remove('ip_cluster')
+        data[key] = data[h].sum(axis=1)
     return data
-
 
 data = compute_sum_per_metric(data, dict_lists)
 
@@ -108,7 +108,6 @@ def make_spider_web_v2(raw_data, stat, title_att):
                           color_discrete_sequence=px.colors.sequential.Plasma_r,
                           template="plotly_dark", )
       fig.show()
-      pyo.plot(fig)
 
 
 #Plotting spiderwebs
