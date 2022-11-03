@@ -91,3 +91,24 @@ overall_accuracy = [
     "not_accurate"
     "cluster"
 ]
+
+categories = [
+    "finishing",
+    "game_reading",
+    "duels",
+    "progression",
+    'established',
+    'creating',
+    'ip_cluster'
+]
+
+
+dict_lists = {
+    'duels': duels,
+    'game_reading': game_reading,
+    'progression': progression,
+    'established': established,
+    'creating': creating,
+    'finishing': finishing
+                   }
+
