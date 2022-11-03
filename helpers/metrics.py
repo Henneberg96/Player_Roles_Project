@@ -13,8 +13,6 @@ duels = [
     "Foul",
     "ip_cluster"
 ]
-
-
 game_reading = [
     "anticipated",
     "anticipation",

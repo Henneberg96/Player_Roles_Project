@@ -36,21 +36,16 @@ def get_stat_values (data, metric):
         vals_clusters = transposed[['vals', 'ip_cluster']]
         vals_clusters_labels = vals_clusters.rename_axis("labels").reset_index()
         vals_clusters_labels.columns.values[0] = "labels"
-        print(vals_clusters_labels)
         final_frame = pd.concat([final_frame, vals_clusters_labels])
     return final_frame
 
-#Compute values across all players
-def get_stat_values_v2 (data, metric, columnName):
-    data[columnName] = data[metric].sum(axis=1)
-    return data
-
-
-
+#Sum scores per key in dict per player
 def compute_sum_per_metric(data, dict):
     for key, val in dict.items():
+        val.remove('ip_cluster')
         data[key] = data[val].sum(axis=1)
     return data
+
 
 data = compute_sum_per_metric(data, dict_lists)
 
@@ -125,7 +120,6 @@ make_spider_web(data, creating, "creating")
 make_spider_web(data, duels, "Duels")
 make_spider_web(data, game_reading, "Game Reading")
 make_spider_web(data, categories, "Categories")
-make_spider_web_v2(data, categories, "categories")
 
 
 
