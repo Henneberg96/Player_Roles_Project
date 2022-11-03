@@ -19,6 +19,7 @@ import plotly.express as px
 
 # Get individuals scores in subcategories
 data = pd.read_csv("C:/ITU/ITU_Research_Project/clustered_data/clusters.csv", sep = ",", encoding='unicode_escape')
+data = pd.read_csv("C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/clusters.csv", sep = ",", encoding='unicode_escape')
 
 #Function to produce averages for each cluster for specified values in arguemnt
 def get_stat_values (data, metric):
@@ -69,15 +70,16 @@ def make_spider_web(raw_data, stat, title_att):
       showlegend=True
   ))
 
+  fig.add_trace(
+      go.Scatterpolar(r=averages_found.vals, fill='toself', opacity=0.4, theta=averages_found.labels, name="# AVG " + str(avg_cluster)),
+  )
+
   for cluster in clusters:
       cluster_df = stat_vals[stat_vals['ip_cluster'] == cluster]
       frame = cluster_df.loc[:, cluster_df.columns != 'ip_cluster']
       fig.add_trace(
-          go.Scatterpolar(r=frame.vals, fill='toself', opacity=0.1, theta=frame.labels, name="# Cluster " + str(cluster)),
+          go.Scatterpolar(r=frame.vals, fill='toself', opacity=0.4, theta=frame.labels, name="# Cluster " + str(cluster)),
       )
-  fig.add_trace(
-      go.Scatterpolar(r=averages_found.vals, fill='toself', theta=averages_found.labels, name="# AVG " + str(avg_cluster)),
-  )
   pyo.plot(fig)
 
 def make_spider_web_v2(raw_data, stat, title_att):
@@ -101,10 +103,10 @@ def make_spider_web_v2(raw_data, stat, title_att):
       pyo.plot(fig)
 
 #Plotting spiderwebs
-make_spider_web(data, progression, "Progression")
 make_spider_web(data, finishing, "Finishing")
+make_spider_web(data, creating, "Creating")
+make_spider_web(data, progression, "Progression")
 make_spider_web(data, established, "Established")
-make_spider_web(data, creating, "creating")
 make_spider_web(data, duels, "Duels")
 make_spider_web(data, game_reading, "Game Reading")
 make_spider_web(data, overall_accuracy, "Accuracy")
