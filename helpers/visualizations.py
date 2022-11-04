@@ -136,6 +136,12 @@ make_spider_web(test, attacking, "Attacking")
 make_spider_web(test, possession, "Possession")
 make_spider_web(test, defending, "Defending")
 
+players = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Players.csv', sep=";", encoding='unicode_escape')
+players.drop(columns=players.columns[0], axis=1, inplace=True)
+dfp = pd.merge(players, test, on='playerId')
+dfp = dfp[dfp.ip_cluster == 7]
+check = dfp.iloc[:, np.r_[1, 15, 16:40]]
+
 # validate clusters
 xyz = names_clusters(test, 1)
 val = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/val.csv', sep=";", encoding='unicode_escape')
