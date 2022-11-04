@@ -1,7 +1,8 @@
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.offline as pyo
-from helpers.metrics import *
+# from helpers.metrics import *
+from helpers.metrics2 import *
 import plotly.express as px
 import numpy as np
 from helpers.helperFunctions import *
@@ -112,16 +113,15 @@ def make_spider_web_v2(raw_data, stat, title_att):
       fig.show()
 
 # getting percentiles
-ids = data.iloc[:, np.r_[0:6]]
-test = data.iloc[:, np.r_[6:58]]
+ids = data.iloc[:, np.r_[0:5]]
+test = data.iloc[:, np.r_[5:29]]
 test = test.rank(pct = True)
 test = pd.concat([ids.reset_index(drop=True),test.reset_index(drop=True)], axis=1)
 test = compute_sum_per_metric(test, dict_lists)
 
-
-test = data.iloc[:, np.r_[58:64]]
-test = test.rank(pct = True)
-test = pd.concat([ids.reset_index(drop=True),test.reset_index(drop=True)], axis=1)
+test2 = test.iloc[:, np.r_[25:30]]
+test2 = test2.rank(pct = True)
+test2 = pd.concat([ids.reset_index(drop=True),test2.reset_index(drop=True)], axis=1)
 
 #Plotting spiderwebs
 make_spider_web(data, finishing, "Finishing")
@@ -130,7 +130,11 @@ make_spider_web(data, progression, "Progression")
 make_spider_web(data, established, "Established")
 make_spider_web(data, duels, "Duels")
 make_spider_web(data, game_reading, "Game Reading")
-make_spider_web(test, categories, "Categories")
+make_spider_web(test2, categories, "Categories")
+
+make_spider_web(test, attacking, "Attacking")
+make_spider_web(test, possession, "Possession")
+make_spider_web(test, defending, "Defending")
 
 # validate clusters
 xyz = names_clusters(test, 1)

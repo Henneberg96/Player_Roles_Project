@@ -183,12 +183,8 @@ dfc = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/ev
 dfc['goals_pr_shot'] = dfc['goal'] / dfc['Shot']
 dfc['pp_pass_ratio'] = dfc['progressive_passes'] / (dfc['Cross'] + dfc['Hand pass'] + dfc['Head pass'] + dfc['High pass'] + dfc['Launch'] + dfc['Simple pass'] + dfc['Smart pass'])
 dfc['key_pass_ratio'] = dfc['key_pass'] / (dfc['Cross'] + dfc['Hand pass'] + dfc['Head pass'] + dfc['High pass'] + dfc['Launch'] + dfc['Simple pass'] + dfc['Smart pass'])
-dfc['acc_ratio'] = dfc['accurate'] / dfc['not_accurate']
-dfc['counter_opportunity_ratio'] = dfc['counter_attack'] / dfc['opportunity']
-dfc['anticipation_percentage'] = dfc['anticipated'] / dfc['Ground defending duel']
-dfc['interception_percentage'] = dfc['interception'] / (dfc['Ground loose ball duel'] + dfc['Ground attacking duel'])
-dfc['slide_tackle_ratio'] = dfc['sliding_tackle'] / (dfc['Ground loose ball duel'] + dfc['Ground attacking duel'] + dfc['Ground defending duel'])
-dfc['dangerous_duel_loss_ratio'] = dfc['dangerous_ball_lost'] / (dfc['Ground loose ball duel'] + dfc['Ground attacking duel'])
+dfc['anticipation_percentage'] = dfc['anticipation'] / dfc['Ground defending duel']
+dfc['slide_tackle_ratio'] = dfc['sliding_tackle'] / (dfc['Ground loose ball duel'] + dfc['Ground defending duel'])
 
 # merging with played minutes
 minutes = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Positions_Minutes.csv',
