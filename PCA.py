@@ -12,8 +12,7 @@ raw = pd.read_csv("C:/ITU/ITU_Research_Project/preprocessed/events_CN.csv", sep 
 
 # loading
 raw = pd.read_csv('C:/ITU/ITU_Research_Project/preprocessed/events_CN.csv',
-                  sep=",",
-                  encoding='unicode_escape')
+                  sep=",", encoding='unicode_escape')
 
 # saving IDs
 df_id = raw[['playerId', 'seasonId', 'teamId', 'map_group', 'pos_group']]
