@@ -195,24 +195,30 @@ def opt_clus(dr):
     # bic_score = []
     # aic_score = []
     sil_score = []
+    chi_score = []
+    dbi_score = []
 
     for n in n_range:
         gm = GaussianMixture(n_components=n, covariance_type='full', random_state=42)
         gm.fit(dr)
         labels = gm.predict(dr)
         #labels = labels.reshape(labels.shape[0], 1) # for 3D
-        # print(("Clusters: ", n, "Siloutte: ", metrics.silhouette_score(dr, labels, metric='euclidean')))
+        print(("Clusters: ", n, "Siloutte: ", metrics.silhouette_score(dr, labels, metric='euclidean')))
         # bic_score.append(gm.bic(dr))
         # aic_score.append(gm.aic(dr))
         sil_score.append(metrics.silhouette_score(dr, labels, metric='euclidean'))
+        chi_score.append(metrics.calinski_harabasz_score(dr, labels)/10000)
+        dbi_score.append(metrics.davies_bouldin_score(dr, labels))
 
     fig, ax = plt.subplots(figsize=(12, 8), nrows=1)
     # ax.plot(n_range, bic_score, '-o', color='orange', label='BIC')
     # ax.plot(n_range, aic_score, '-o', color='blue', label='AIC')
     ax.plot(n_range, sil_score, '-o', color='orange', label='SIL')
+    ax.plot(n_range, chi_score, '-o', color='blue', label='CHI')
+    ax.plot(n_range, dbi_score, '-o', color='green', label='DBI')
     ax.set(xlabel='Number of Clusters', ylabel='Score')
     ax.set_xticks(n_range)
-    ax.set_title('BIC and AIC Scores Per Number Of Clusters')
+    ax.set_title('Evaluation Scores Per Number Of Clusters')
     ax.legend(fontsize='x-large')
     plt.show()
 

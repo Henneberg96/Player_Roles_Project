@@ -2,15 +2,17 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import umap
 from helpers.helperFunctions import *
 import plotly.express as px
 from sklearn.mixture import GaussianMixture
+import umap.umap_ as umap
 
 # loading
 df = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_CN_UMAP.csv',
                  sep=",",
                  encoding='unicode_escape')
+
+df = df.drop(['playerId', 'seasonId', 'map_group', 'pos_group'], axis=1)
 
 # creating data set
 df_id = df[['playerId', 'seasonId', 'teamId', 'map_group', 'pos_group']]
@@ -33,6 +35,9 @@ df_id_att = df_id[df_id.pos_group == 'ATT']
 
 # applying UMAP - remember to install pynndescent to make it run faster
 dr_def = umap.UMAP(n_neighbors=80, min_dist=0.0, n_components=3, random_state=42).fit_transform(df_def)
+
+df = umap.UMAP(n_neighbors=80, min_dist=0.0, n_components=3, random_state=42).fit_transform(df)
+
 dr_mid = umap.UMAP(n_neighbors=80, min_dist=0.0, n_components=3, random_state=42).fit_transform(df_mid)
 dr_wide = umap.UMAP(n_neighbors=80, min_dist=0.0, n_components=3, random_state=42).fit_transform(df_wide)
 dr_att = umap.UMAP(n_neighbors=80, min_dist=0.0, n_components=3, random_state=42).fit_transform(df_att)
