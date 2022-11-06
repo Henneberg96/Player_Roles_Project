@@ -8,7 +8,7 @@ from advanced_pca import CustomPCA
 
 
 # Load dataset
-raw = pd.read_csv("C:/ITU/ITU_Research_Project/preprocessed/events_CN.csv", sep = ",", encoding='unicode_escape')
+raw = pd.read_csv("C:/ITU/ITU_Research_Project/clustered_data/events_CN_UMAP.csv", sep = ",", encoding='unicode_escape')
 
 # loading
 raw = pd.read_csv('C:/ITU/ITU_Research_Project/preprocessed/events_CN.csv',
@@ -18,6 +18,7 @@ raw = pd.read_csv('C:/ITU/ITU_Research_Project/preprocessed/events_CN.csv',
 # saving IDs
 df_id = raw[['playerId', 'seasonId', 'teamId', 'map_group', 'pos_group']]
 raw = raw.drop(['playerId', 'seasonId', 'teamId', 'map_group', 'pos_group', ], axis=1)
+raw = raw.drop(['playerId', 'seasonId', 'map_group', 'pos_group', ], axis=1)
 
 # variance thresholding
 vt = VarianceThreshold(threshold=0.003)
@@ -34,7 +35,7 @@ df_ip = raw.iloc[:, np.r_[0:4, 5:8, 10:19, 23:27, 29:31, 36:44, 46, 48, 51:57]]
 data = raw.drop(['playerId', 'seasonId', 'map_group', 'pos_group', 'teamId'], axis=1)
 
 #Split in train and test set
-def_input_train, def_input_test = train_test_split(df_op,test_size=0.20, random_state=42)
+def_input_train, def_input_test = train_test_split(raw,test_size=0.20, random_state=42)
 
 #Create pca instance
 pca = PCA(n_components=0.8)

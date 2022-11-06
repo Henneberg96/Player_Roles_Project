@@ -3,12 +3,12 @@ import plotly.graph_objects as go
 import plotly.offline as pyo
 from helpers.metrics import *
 import plotly.express as px
-
-#Unused imports
-'''
 import numpy as np
 import matplotlib.pyplot as plt
 from mplsoccer import Pitch
+
+#Unused imports
+'''
 import seaborn as sns
 import plotly.express as px
 '''
@@ -47,7 +47,6 @@ def compute_sum_per_metric(data, dict):
     return data
 
 data = compute_sum_per_metric(data, dict_lists)
-
 
 
 def get_avg(df):
@@ -119,6 +118,58 @@ make_spider_web(data, duels, "Duels")
 make_spider_web(data, game_reading, "Game Reading")
 make_spider_web(data, categories, "Categories")
 
+
+
+def createPitchWithZones():
+    data = np.array([
+        [0, 0],
+        [16, 0],  # x+16
+        [0, 19],
+        [16, 19],  # x+17
+        [33, 0],
+        [33, 19],
+        [67, 0],  # x+34
+        [67, 19],
+        [84, 0],
+        [84, 19],
+        [100, 0],
+        [100, 19],
+        [0, 81],
+        [0, 100],
+        [16, 81],
+        [16, 100],
+        [33, 81],
+        [33, 100],
+        [67, 81],  # x+34
+        [67, 100],
+        [84, 81],
+        [84, 100],
+        [100, 81],
+        [100, 100],
+        [16, 63],
+        [16, 63],
+        [16, 63],
+        [33, 63],
+        [67, 63],
+        [16, 37],
+        [33, 37],
+        [50, 19],
+        [50, 0],
+        [50, 37],
+        [50, 63],
+        [50, 81],
+        [50, 100],
+        [67, 37],
+        [84, 37],
+        [84, 63], ])
+    pitch = Pitch(pitch_type='wyscout', axis=True,
+                  positional=True,
+                  tick=True,
+                  label=True)
+    fig, ax = pitch.draw()
+    x, y = data.T
+    plt.scatter(x, y)
+    plt.show()
 
 #-------------------------------------- Unused code atm ----------------------------------------------#
 
@@ -234,54 +285,5 @@ plt.show()
 sns.barplot(data=def_scores, x="labels", y="values", hue='cluster')
 plt.show()
 
-def createPitchWithZones():
-    data = np.array([
-        [0, 0],
-        [16, 0],  # x+16
-        [0, 19],
-        [16, 19],  # x+17
-        [33, 0],
-        [33, 19],
-        [67, 0],  # x+34
-        [67, 19],
-        [84, 0],
-        [84, 19],
-        [100, 0],
-        [100, 19],
-        [0, 81],
-        [0, 100],
-        [16, 81],
-        [16, 100],
-        [33, 81],
-        [33, 100],
-        [67, 81],  # x+34
-        [67, 100],
-        [84, 81],
-        [84, 100],
-        [100, 81],
-        [100, 100],
-        [16, 63],
-        [16, 63],
-        [16, 63],
-        [33, 63],
-        [67, 63],
-        [16, 37],
-        [33, 37],
-        [50, 19],
-        [50, 0],
-        [50, 37],
-        [50, 63],
-        [50, 81],
-        [50, 100],
-        [67, 37],
-        [84, 37],
-        [84, 63], ])
-    pitch = Pitch(pitch_type='wyscout', axis=True,
-                  positional=True,
-                  tick=True,
-                  label=True)
-    fig, ax = pitch.draw()
-    x, y = data.T
-    plt.scatter(x, y)
-    plt.show()
+
 '''

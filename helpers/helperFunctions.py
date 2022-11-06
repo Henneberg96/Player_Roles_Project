@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.mixture import GaussianMixture
 import matplotlib.pyplot as plt
 from sklearn import metrics
+from mplsoccer import Pitch
 
 
 # Filter to determine where an event occured
@@ -180,3 +181,124 @@ def find_outliers_IQR(df):
    IQR=q3-q1
    outliers = df[((df<(q1-1.5*IQR)) | (df>(q3+1.5*IQR)))]
    return outliers
+
+data = pd.read_csv("C:/ITU/ITU_Research_Project/Data_v2/events.csv", sep = ",", encoding='unicode_escape')
+
+# Method to check if a cross departs from a white space area and that it reached the penalty field
+def isWhiteSpaceCross (eventType, row):
+    x_start = row['x']
+    y_start = row['y']
+    x_end = row['end_x']
+    y_end = row['end_y']
+    if(row[eventType] == 1):
+        ws_start_condition = x_start > 50 and x_start <= 100 and y_start >= 0 and y_start < 19 | x_start > 50 and x_start <= 100 and y_start > 81 and y_start <= 100
+        end_condition = x_end > 84 and x_end <= 100 and y_end > 19 and y_end < 81
+        if(ws_start_condition and end_condition):
+            return 1
+        else: return 0
+    else: return 0
+
+# Method to check if a cross departs from a wide space area and that it reached the penalty field
+def isHalfSpaceCross (eventType, row):
+    x_start = row['x']
+    y_start = row['y']
+    x_end = row['end_x']
+    y_end = row['end_y']
+    if(row[eventType] == 1):
+        hs_start_condition = x_start > 50 and x_start <= 84 and y_start >= 19 and y_start <= 37 | x_start > 50 and x_start <= 84 and y_start >= 63 and y_start <= 81
+        end_condition = x_end > 84 and x_end <= 100 and y_end > 19 and y_end < 81
+        if(hs_start_condition and end_condition):
+            return 1
+        else: return 0
+    else: return 0
+
+
+data['white_space_cross'] = data.apply(lambda row: isWhiteSpaceCross('Cross', row), axis=1)
+data['half_space_cross'] = data.apply(lambda row: isHalfSpaceCross('Cross', row), axis=1)
+
+
+#Draw half space, white space and penalty field
+def draw_wide_spaces_and_half_spaces():
+    areas = np.array([
+        [50, 19],
+        [84, 19],
+        [50, 37],
+        [84, 37],
+        [50, 63],
+        [84, 63],
+        [50, 81],
+        [84, 81],
+        [84, 19],
+        [100, 19],
+        [84, 81],
+        [100, 81],
+        [50, 0],
+        [50, 19],
+        [100, 0],
+        [100, 19],
+        [50, 81],
+        [50, 100],
+        [100, 81],
+        [100, 100],
+
+    ])
+    pitch = Pitch(pitch_type='wyscout', axis=True,
+                  positional=True,
+                  tick=True,
+                  label=True)
+    fig, ax = pitch.draw()
+    x_start, y_start = areas.T
+    plt.scatter(x_start, y_start)
+    plt.show()
+
+    areas = np.array([
+        [50, 0],
+        [50, 19],
+        [100, 0],
+        [100, 19],
+        [50, 81],
+        [50, 100],
+        [100, 81],
+        [100, 100],
+
+    ])
+    pitch = Pitch(pitch_type='wyscout', axis=True,
+                  positional=True,
+                  tick=True,
+                  label=True)
+    fig, ax = pitch.draw()
+    x_start, y_start = areas.T
+    plt.scatter(x_start, y_start)
+    plt.show()
+
+    areas = np.array([
+        [84, 19],
+        [100, 19],
+        [84, 81],
+        [100, 81],
+    ])
+    pitch_2 = Pitch(pitch_type='wyscout', axis=True,
+                    positional=True,
+                    tick=True,
+                    label=True)
+    fig, ax = pitch_2.draw()
+    x_start, y_start = areas.T
+    plt.scatter(x_start, y_start)
+    plt.show()
+
+
+'''
+
+def checkVals(row):
+    f = row['white_space_cross']
+    g = row['half_space_cross']
+    if(f == 1 and g == 1):
+        print(row['x'])
+        print(row['y'])
+        print(row['end_x'])
+        print(row['end_y'])
+        print(f)
+        print(g)
+data.apply(lambda row: checkVals(row), axis=1)
+
+'''
