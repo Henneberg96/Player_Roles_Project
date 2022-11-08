@@ -49,7 +49,7 @@ def compute_sum_per_metric(data, dict):
         data[key] = data[h].sum(axis=1)
     return data
 
-data = compute_sum_per_metric(data, dict_lists)
+# data = compute_sum_per_metric(data, dict_lists)
 
 
 
@@ -112,9 +112,24 @@ def make_spider_web_v2(raw_data, stat, title_att):
                           template="plotly_dark", )
       fig.show()
 
+
+def pareto(df, cluster):
+    df = df.drop(['playerId', 'seasonId', 'map_group', 'pos_group'], axis=1)
+    df = df.groupby(['ip_cluster'], as_index=False).mean()
+    df = df[df.ip_cluster == cluster]
+    df = df.drop(['ip_cluster'], axis=1)
+    df = df.T
+    df.rename(columns={df.columns[0]: "value"}, inplace=True)
+    df = df.sort_values('value', ascending=False)
+
+    fig = px.bar(df, x=df.index, y=df['value'])
+    fig.add_hline(y=0.5)
+    fig.show()
+
+
 # getting percentiles
 ids = data.iloc[:, np.r_[0:5]]
-test = data.iloc[:, np.r_[5:29]]
+test = data.iloc[:, np.r_[5:26]]
 test = test.rank(pct = True)
 test = pd.concat([ids.reset_index(drop=True),test.reset_index(drop=True)], axis=1)
 test = compute_sum_per_metric(test, dict_lists)
@@ -135,12 +150,13 @@ make_spider_web(test2, categories, "Categories")
 make_spider_web(test, attacking, "Attacking")
 make_spider_web(test, possession, "Possession")
 make_spider_web(test, defending, "Defending")
+pareto(test, 0)
 
 players = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Players.csv', sep=";", encoding='unicode_escape')
 players.drop(columns=players.columns[0], axis=1, inplace=True)
 dfp = pd.merge(players, test, on='playerId')
-dfp = dfp[dfp.ip_cluster == 5]
-check = dfp.iloc[:, np.r_[1, 15, 16:40]]
+dfp = dfp[dfp.ip_cluster == 0]
+check = dfp.iloc[:, np.r_[1, 15, 16:37]]
 
 # validate clusters
 xyz = names_clusters(test, 1)

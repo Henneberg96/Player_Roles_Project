@@ -202,34 +202,36 @@ df_norm = df_norm.iloc[:, np.r_[0:27]].div(df_norm.games, axis=0)
 dfc = pd.concat([df_id.reset_index(drop=True),df_norm.reset_index(drop=True)], axis=1)
 
 # stat ratios
-dfc['ws_cross_ratio'] = dfc['ws_cross'] / dfc['Cross']
-dfc['hs_cross_ratio'] = dfc['hs_cross'] / dfc['Cross']
+dfc['ws_cross_tendency'] = (dfc['ws_cross'] / dfc['Cross']) * dfc['ws_cross']
+dfc['hs_cross_tendency'] = (dfc['hs_cross'] / dfc['Cross']) * dfc['hs_cross']
 
-dfc['safe_pass_ratio'] = dfc['non_forward'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass'])
-dfc['smart_pass_ratio'] = dfc['Smart pass'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass'])
-dfc['switches_ratio'] = dfc['switches'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass'])
-dfc['simple_pass_ratio'] = dfc['Simple pass'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass'])
-dfc['key_pass_ratio'] = dfc['key_pass'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass'])
-dfc['pp_ratio'] = dfc['progressive_passes'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass'])
+dfc['safe_pass_tendency'] = (dfc['non_forward'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass'])) * dfc['non_forward']
+dfc['smart_pass_tendency'] = (dfc['Smart pass'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass'])) * dfc['Smart pass']
+dfc['switches_tendency'] = (dfc['switches'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass'])) * dfc['switches']
+dfc['simple_pass_tendency'] = (dfc['Simple pass'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass']))* dfc['Simple pass']
+dfc['key_pass_tendency'] = (dfc['key_pass'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass'])) * dfc['key_pass']
+dfc['pp_tendency'] = (dfc['progressive_passes'] / (dfc['Cross'] + dfc['Head pass'] + dfc['High pass'] + dfc['Simple pass'] + dfc['Smart pass'])) * dfc['progressive_passes']
 
-dfc['pp_tendency'] = dfc['progressive_passes'] / (dfc['progressive_passes'] + dfc['Acceleration'])
-dfc['pc_tendency'] = dfc['Acceleration'] / (dfc['progressive_passes'] + dfc['Acceleration'])
+dfc['ptp_ratio'] = dfc['progressive_passes'] / (dfc['progressive_passes'] + dfc['Acceleration'])
+dfc['ptc_ratio'] = dfc['Acceleration'] / (dfc['progressive_passes'] + dfc['Acceleration'])
 
-dfc['anticipation_percentage'] = dfc['anticipated'] / dfc['Ground defending duel']
-dfc['foul_tendency'] = dfc['Foul'] / (dfc['Ground loose ball duel'] + dfc['Ground defending duel'])
-dfc['air_duel_ratio'] = dfc['Air duel'] / (dfc['Ground loose ball duel'] + dfc['Ground defending duel'] + dfc['Air duel'])
+dfc['anticipation_ratio'] = dfc['anticipated'] / dfc['Ground defending duel']
+dfc['foul_tendency'] = (dfc['Foul'] / (dfc['Ground loose ball duel'] + dfc['Ground defending duel'])) * dfc['Foul']
+dfc['air_duel_tendency'] = (dfc['Air duel'] / (dfc['Ground loose ball duel'] + dfc['Ground defending duel'] + dfc['Air duel'])) * dfc['Air duel']
+dfc['gd_duel_tendency'] = (dfc['Ground defending duel'] / (dfc['Ground loose ball duel'] + dfc['Ground defending duel'] + dfc['Air duel'])) * dfc['Ground defending duel']
+dfc['aThird_duel_tendency'] = (dfc['lThird_def_duels'] / (dfc['Ground loose ball duel'] + dfc['Ground defending duel'] + dfc['Air duel'])) * dfc['lThird_def_duels']
 
-dfc['goals_pr_shot'] = dfc['goal'] / dfc['Shot']
-dfc['shot_ratio_nonPA'] = dfc['shots_nonPenArea'] / dfc['Shot']
-dfc['shot_ratio_PA'] = dfc['shots_penArea'] / dfc['Shot']
+dfc['nonPA_shots_tendency'] = (dfc['shots_nonPenArea'] / dfc['Shot']) * dfc['shots_nonPenArea']
+dfc['PA_shots_tendency'] = (dfc['shots_penArea'] / dfc['Shot']) * dfc['shots_penArea']
 
 dfc = dfc.fillna(0)
 
 # deselecting columns no longer for use
 dfc = dfc.drop(['key_pass', 'progressive_passes', 'switches', 'non_forward', 'Head pass', 'High pass', 'Simple pass', 'Smart pass',
-                'Cross', 'ws_cross', 'hs_cross',
-                'anticipated', 'Foul', 'Ground loose ball duel',
+                'ws_cross', 'hs_cross', 'Cross',
+                'anticipated', 'Foul', 'Ground loose ball duel', 'lThird_def_duels', 'Air duel', 'Ground defending duel',
                 'accurate', 'not_accurate',
+                'Acceleration',
                 'shots_penArea', 'shots_nonPenArea', 'Shot'],
              axis=1)
 
@@ -249,13 +251,12 @@ dfc = pd.merge(dfc, pos, on=['playerId', 'seasonId'])
 # removing goalkeepers
 dfc = dfc[dfc.map_group != 'GK']
 nan_check = pd.DataFrame(dfc.isna().sum())
-dfc_pos = dfc[['playerId', 'seasonId', "map_group", "pos_group"]]
 
 # further normalization - scaling
 scale = MinMaxScaler()
 dfc.replace([np.inf, -np.inf], 0, inplace=True)
-dfc_id = dfc.iloc[:, np.r_[0:2, 26:28]]
-dfc_scale = dfc.iloc[:, np.r_[2:26]]
+dfc_id = dfc.iloc[:, np.r_[0:2, 23:25]]
+dfc_scale = dfc.iloc[:, np.r_[2:23]]
 dfc_scaled = dfc_scale.copy()
 
 dfc_scaled[dfc_scaled.columns] = scale.fit_transform(dfc_scaled[dfc_scaled.columns])

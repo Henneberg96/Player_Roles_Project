@@ -1,39 +1,36 @@
 # DEF ATTRIBUTES --------------------------------------------------------
 defending = [
-    "lThird_def_duels",
-    "Air duel",
-    "Ground defending duel",
+    "aThird_duel_tendency",
+    "gd_duel_tendency",
     "foul_tendency",
-    "air_duel_ratio",
+    "air_duel_tendency",
     "Clearance",
-    "anticipation_percentage",
+    "anticipation_ratio",
     "ip_cluster"
 ]
 
 # POSSESION ATTRIBUTES --------------------------------------------------------
 possession = [
-    "safe_pass_ratio",
-    "switches_ratio",
-    "simple_pass_ratio",
-    "Acceleration",
-    "pp_ratio",
+    "safe_pass_tendency",
+    "switches_tendency",
+    "simple_pass_tendency",
     "pp_tendency",
-    "pc_tendency",
+    "ptp_ratio",
+    "ptc_ratio",
     "ip_cluster"
 ]
 
 # ATTACKING ATTRIBUTES ------------------------------
 attacking = [
     "goal",
-    "goals_pr_shot",
-    "shot_ratio_nonPA",
-    "shot_ratio_PA",
+    "PA_shots_tendency",
+    "nonPA_shots_tendency",
     "assist",
     "Ground attacking duel",
-    "ws_cross_ratio",
-    "hs_cross_ratio",
-    "smart_pass_ratio",
-    "key_pass_ratio",
+    "ws_cross_tendency",
+    "hs_cross_tendency",
+    "smart_pass_tendency",
+    "key_pass_tendency",
     "ip_cluster"
 ]
 
