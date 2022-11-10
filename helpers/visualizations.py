@@ -22,7 +22,7 @@ import plotly.express as px
 
 # Get individuals scores in subcategories
 data = pd.read_csv("C:/ITU/ITU_Research_Project/clustered_data/clusters.csv", sep = ",", encoding='unicode_escape')
-data = pd.read_csv("C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/clusters.csv", sep = ",", encoding='unicode_escape')
+data = pd.read_csv("C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/clustersTEST.csv", sep = ",", encoding='unicode_escape')
 
 #Function to produce averages for each cluster for specified values in arguemnt
 def get_stat_values (data, metric):
@@ -126,6 +126,18 @@ def pareto(df, cluster):
     fig.add_hline(y=0.5)
     fig.show()
 
+def stat_comp(df):
+    df = df.drop(['playerId', 'seasonId', 'map_group', 'pos_group'], axis=1)
+    df = df.groupby(['ip_cluster'], as_index=False).mean()
+    return df
+
+def pos_dist(df, cluster):
+    df = df.drop(['playerId', 'seasonId', 'pos_group'], axis=1)
+    df = df[df.ip_cluster == cluster]
+    df = df.drop(['ip_cluster'], axis=1)
+    df = df.groupby(['map_group'], as_index=False).count()
+    return df
+
 
 # getting percentiles
 ids = data.iloc[:, np.r_[0:5]]
@@ -151,12 +163,14 @@ make_spider_web(test, attacking, "Attacking")
 make_spider_web(test, possession, "Possession")
 make_spider_web(test, defending, "Defending")
 pareto(test, 0)
+check = stat_comp(test)
+check2 = pos_dist(test, 5)
 
 players = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Players.csv', sep=";", encoding='unicode_escape')
 players.drop(columns=players.columns[0], axis=1, inplace=True)
 dfp = pd.merge(players, test, on='playerId')
-dfp = dfp[dfp.ip_cluster == 0]
-check = dfp.iloc[:, np.r_[1, 15, 16:37]]
+dfp = dfp[dfp.ip_cluster == 1]
+check3 = dfp.iloc[:, np.r_[1, 15, 16:37]]
 
 # validate clusters
 xyz = names_clusters(test, 1)

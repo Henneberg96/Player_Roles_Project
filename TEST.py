@@ -23,7 +23,7 @@ mask = vt.get_support() # getting boolean mask
 test = df.loc[:, mask] # subsetting the data
 
 # applying UMAP - remember to install pynndescent to make it run faster
-dr = umap.UMAP(n_neighbors=100, min_dist=0.0, n_components=2, random_state=42).fit_transform(df)
+dr = umap.UMAP(n_neighbors=50, min_dist=0.0, n_components=2, random_state=42).fit_transform(df)
 
 # when n_components=2
 dr2 = pd.DataFrame(dr, columns=["x", "y"])
@@ -35,13 +35,14 @@ plt.show()
 opt_clus(dr)
 
 # clustering
-gmm = GaussianMixture(n_components=15, covariance_type='full', random_state=42).fit(dr).predict(dr)
+gmm = GaussianMixture(n_components=11, covariance_type='full', random_state=42).fit(dr).predict(dr)
 plt.scatter(dr[:, 0], dr[:, 1], c=gmm, s=40, cmap='viridis')
 plt.show()
 
 # merging
 df2 = pd.concat([df.reset_index(drop=True),gmm_to_df(gmm, "ip").reset_index(drop=True)], axis=1)
 df2_id = pd.concat([df_id.reset_index(drop=True),gmm_to_df(gmm, "ip").reset_index(drop=True)], axis=1)
+# df2_id = pd.concat([df2_id.reset_index(drop=True),df.reset_index(drop=True)], axis=1)
 
 # creating DFs
 c0 = df2[df2.ip_cluster == 0]
@@ -86,7 +87,7 @@ plt.show()
 test.groupby(['map_group'], as_index=False).count()
 
 # creating clusters
-opt_clus(dr4_ip) # running for 0-5
+opt_clus(dr0_ip) # running for 0-5
 gmm0_ip = GaussianMixture(n_components=3, covariance_type='full', random_state=42).fit(dr0_ip).predict(dr0_ip)
 gmm1_ip = GaussianMixture(n_components=2, covariance_type='full', random_state=42).fit(dr1_ip).predict(dr1_ip)
 gmm2_ip = GaussianMixture(n_components=2, covariance_type='full', random_state=42).fit(dr2_ip).predict(dr2_ip)
@@ -121,4 +122,4 @@ val_df.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/valDF.
 stats = [c0, c1, c2, c3, c4]
 stats2 = pd.concat(stats)
 test = pd.concat([val2.reset_index(drop=True),stats2.reset_index(drop=True)], axis=1)
-test.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/clusters.csv', index=False)
+test.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/clustersTEST.csv', index=False)
