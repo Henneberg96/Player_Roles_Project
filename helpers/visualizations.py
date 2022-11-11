@@ -1,11 +1,8 @@
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.offline as pyo
-# from helpers.metrics import *
-from helpers.metrics2 import *
+from helpers.metrics import *
 import plotly.express as px
-import numpy as np
-from helpers.helperFunctions import *
 
 #Unused imports
 '''
@@ -22,7 +19,7 @@ import plotly.express as px
 
 # Get individuals scores in subcategories
 data = pd.read_csv("C:/ITU/ITU_Research_Project/clustered_data/clusters.csv", sep = ",", encoding='unicode_escape')
-data = pd.read_csv("C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/clustersTEST.csv", sep = ",", encoding='unicode_escape')
+#data = pd.read_csv("C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/clusters.csv", sep = ",", encoding='unicode_escape')
 
 #Function to produce averages for each cluster for specified values in arguemnt
 def get_stat_values (data, metric):
@@ -49,7 +46,7 @@ def compute_sum_per_metric(data, dict):
         data[key] = data[h].sum(axis=1)
     return data
 
-# data = compute_sum_per_metric(data, dict_lists)
+data = compute_sum_per_metric(data, dict_lists)
 
 
 
@@ -113,43 +110,6 @@ def make_spider_web_v2(raw_data, stat, title_att):
       fig.show()
 
 
-def pareto(df, cluster):
-    df = df.drop(['playerId', 'seasonId', 'map_group', 'pos_group'], axis=1)
-    df = df.groupby(['ip_cluster'], as_index=False).mean()
-    df = df[df.ip_cluster == cluster]
-    df = df.drop(['ip_cluster'], axis=1)
-    df = df.T
-    df.rename(columns={df.columns[0]: "value"}, inplace=True)
-    df = df.sort_values('value', ascending=False)
-
-    fig = px.bar(df, x=df.index, y=df['value'])
-    fig.add_hline(y=0.5)
-    fig.show()
-
-def stat_comp(df):
-    df = df.drop(['playerId', 'seasonId', 'map_group', 'pos_group'], axis=1)
-    df = df.groupby(['ip_cluster'], as_index=False).mean()
-    return df
-
-def pos_dist(df, cluster):
-    df = df.drop(['playerId', 'seasonId', 'pos_group'], axis=1)
-    df = df[df.ip_cluster == cluster]
-    df = df.drop(['ip_cluster'], axis=1)
-    df = df.groupby(['map_group'], as_index=False).count()
-    return df
-
-
-# getting percentiles
-ids = data.iloc[:, np.r_[0:5]]
-test = data.iloc[:, np.r_[5:26]]
-test = test.rank(pct = True)
-test = pd.concat([ids.reset_index(drop=True),test.reset_index(drop=True)], axis=1)
-test = compute_sum_per_metric(test, dict_lists)
-
-test2 = test.iloc[:, np.r_[25:30]]
-test2 = test2.rank(pct = True)
-test2 = pd.concat([ids.reset_index(drop=True),test2.reset_index(drop=True)], axis=1)
-
 #Plotting spiderwebs
 make_spider_web(data, finishing, "Finishing")
 make_spider_web(data, creating, "Creating")
@@ -157,27 +117,8 @@ make_spider_web(data, progression, "Progression")
 make_spider_web(data, established, "Established")
 make_spider_web(data, duels, "Duels")
 make_spider_web(data, game_reading, "Game Reading")
-make_spider_web(test2, categories, "Categories")
+make_spider_web(data, categories, "Categories")
 
-make_spider_web(test, attacking, "Attacking")
-make_spider_web(test, possession, "Possession")
-make_spider_web(test, defending, "Defending")
-pareto(test, 0)
-check = stat_comp(test)
-check2 = pos_dist(test, 5)
-
-players = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Players.csv', sep=";", encoding='unicode_escape')
-players.drop(columns=players.columns[0], axis=1, inplace=True)
-dfp = pd.merge(players, test, on='playerId')
-dfp = dfp[dfp.ip_cluster == 1]
-check3 = dfp.iloc[:, np.r_[1, 15, 16:37]]
-
-# validate clusters
-xyz = names_clusters(test, 1)
-val = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/val.csv', sep=";", encoding='unicode_escape')
-xyz = data.iloc[:, np.r_[0, 5]]
-val_df = pd.merge(val, xyz, on='playerId')
-val_df.to_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/valDF.csv', index=False)
 
 #-------------------------------------- Unused code atm ----------------------------------------------#
 

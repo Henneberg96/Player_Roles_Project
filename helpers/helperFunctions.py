@@ -68,58 +68,14 @@ def findArea(row):
         s = 0
     return s
 
-
-def pen_shots(x, y):
-    return np.where(x > 83,
-                    np.where(x < 101,
-                             np.where(y > 18,
-                                      np.where(y < 82, 1.00000, 0.0000), 0.00000), 0.00000), 0.00000)
-
-def non_pen_shots(x, y):
-    return np.where(x > 83,
-                    np.where(x < 101,
-                             np.where(y > 18,
-                                      np.where(y < 82, 0.00000, 1.0000), 1.00000), 1.00000), 1.00000)
-
-def last_third_def(x):
-    return np.where(x > 66, 1.00000, 0.00000)
-
-def isWhiteSpaceCross (eventType, row):
-    x_start = row['x']
-    y_start = row['y']
-    x_end = row['end_x']
-    y_end = row['end_y']
-    if(row[eventType] == 1):
-        ws_start_condition = x_start > 50 and x_start <= 100 and y_start >= 0 and y_start < 19 | x_start > 50 and x_start <= 100 and y_start > 81 and y_start <= 100
-        end_condition = x_end > 84 and x_end <= 100 and y_end > 19 and y_end < 81
-        if(ws_start_condition and end_condition):
-            return 1
-        else: return 0
-    else: return 0
-
-
-def isHalfSpaceCross (eventType, row):
-    x_start = row['x']
-    y_start = row['y']
-    x_end = row['end_x']
-    y_end = row['end_y']
-    if(row[eventType] == 1):
-        hs_start_condition = x_start > 50 and x_start <= 84 and y_start >= 19 and y_start <= 37 | x_start > 50 and x_start <= 84 and y_start >= 63 and y_start <= 81
-        end_condition = x_end > 84 and x_end <= 100 and y_end > 19 and y_end < 81
-        if(hs_start_condition and end_condition):
-            return 1
-        else: return 0
-    else: return 0
-
-
 def ec(x1, x2, y1, y2):
     return np.sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2))
 
 
 def pp(x1, x2):
     dist = x2 - x1
-    return np.where(x1 > 50, np.where(dist > 10, 1.00000, 0.00000),
-                    np.where(dist > 30, 1.00000, 0.00000))
+    return np.where(x1 > 50, np.where(dist > 10, 1.00000, np.nan),
+                    np.where(dist > 25, 1.00000, np.nan))
 
 
 def direction(x1, x2):
@@ -128,14 +84,9 @@ def direction(x1, x2):
                     np.where(dist < -4, 'backward', 'horizontal'))
 
 
-def non_forward(x1, x2):
-    dist = x2 - x1
-    return np.where(dist > 3, 0.00000, 1.00000)
-
-
 def switch(y1, y2):
     dist = y2 - y1
-    return np.where(dist > 35, 1.00000, 0.00000)
+    return np.where(dist > 35, 1.00000, np.nan)
 
 
 def gmode(df):
@@ -192,11 +143,8 @@ def off_def(row):
 
 def opt_clus(dr):
     n_range = range(2, 21)
-    # bic_score = []
-    # aic_score = []
-    sil_score = []
-    chi_score = []
-    dbi_score = []
+    bic_score = []
+    aic_score = []
 
     for n in n_range:
         gm = GaussianMixture(n_components=n, covariance_type='full', random_state=42)
@@ -204,21 +152,15 @@ def opt_clus(dr):
         labels = gm.predict(dr)
         #labels = labels.reshape(labels.shape[0], 1) # for 3D
         print(("Clusters: ", n, "Siloutte: ", metrics.silhouette_score(dr, labels, metric='euclidean')))
-        # bic_score.append(gm.bic(dr))
-        # aic_score.append(gm.aic(dr))
-        sil_score.append(metrics.silhouette_score(dr, labels, metric='euclidean'))
-        chi_score.append(metrics.calinski_harabasz_score(dr, labels)/10000)
-        dbi_score.append(metrics.davies_bouldin_score(dr, labels))
+        bic_score.append(gm.bic(dr))
+        aic_score.append(gm.aic(dr))
 
     fig, ax = plt.subplots(figsize=(12, 8), nrows=1)
-    # ax.plot(n_range, bic_score, '-o', color='orange', label='BIC')
-    # ax.plot(n_range, aic_score, '-o', color='blue', label='AIC')
-    ax.plot(n_range, sil_score, '-o', color='orange', label='SIL')
-    ax.plot(n_range, chi_score, '-o', color='blue', label='CHI')
-    ax.plot(n_range, dbi_score, '-o', color='green', label='DBI')
+    ax.plot(n_range, bic_score, '-o', color='orange', label='BIC')
+    ax.plot(n_range, aic_score, '-o', color='blue', label='AIC')
     ax.set(xlabel='Number of Clusters', ylabel='Score')
     ax.set_xticks(n_range)
-    ax.set_title('Evaluation Scores Per Number Of Clusters')
+    ax.set_title('BIC and AIC Scores Per Number Of Clusters')
     ax.legend(fontsize='x-large')
     plt.show()
 
@@ -236,15 +178,5 @@ def find_outliers_IQR(df):
    q1=df.quantile(0.25)
    q3=df.quantile(0.75)
    IQR=q3-q1
-   outliers = df[((df<(q1-3*IQR)) | (df>(q3+3*IQR)))]
+   outliers = df[((df<(q1-1.5*IQR)) | (df>(q3+1.5*IQR)))]
    return outliers
-
-
-def names_clusters(data, cluster):
-    df = data.iloc[:, np.r_[0, 5, 6:12]]
-    players = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/Wyscout_Players.csv', sep=";", encoding='unicode_escape')
-    players.drop(columns=players.columns[0], axis=1, inplace=True)
-    dfp = pd.merge(players, df, on='playerId')
-    dfp = dfp[dfp.ip_cluster == cluster]
-    dfp = dfp.iloc[:, np.r_[4, 2, 1, 18, 17, 15, 16, 13, 14]]
-    return dfp
