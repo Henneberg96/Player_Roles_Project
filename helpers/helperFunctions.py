@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
+import seaborn as sns
 from sklearn.mixture import GaussianMixture
 import matplotlib.pyplot as plt
 from sklearn import metrics
 from mplsoccer import Pitch
+
 
 
 # Filter to determine where an event occured
@@ -182,7 +184,7 @@ def find_outliers_IQR(df):
    outliers = df[((df<(q1-1.5*IQR)) | (df>(q3+1.5*IQR)))]
    return outliers
 
-data = pd.read_csv("C:/ITU/ITU_Research_Project/Data_v2/events.csv", sep = ",", encoding='unicode_escape')
+#data = pd.read_csv("C:/ITU/ITU_Research_Project/Data_v2/events.csv", sep = ",", encoding='unicode_escape')
 
 # Method to check if a cross departs from a white space area and that it reached the penalty field
 def isWhiteSpaceCross (eventType, row):
@@ -213,8 +215,8 @@ def isHalfSpaceCross (eventType, row):
     else: return 0
 
 
-data['white_space_cross'] = data.apply(lambda row: isWhiteSpaceCross('Cross', row), axis=1)
-data['half_space_cross'] = data.apply(lambda row: isHalfSpaceCross('Cross', row), axis=1)
+#data['white_space_cross'] = data.apply(lambda row: isWhiteSpaceCross('Cross', row), axis=1)
+#data['half_space_cross'] = data.apply(lambda row: isHalfSpaceCross('Cross', row), axis=1)
 
 
 #Draw half space, white space and penalty field
@@ -240,7 +242,6 @@ def draw_wide_spaces_and_half_spaces():
         [50, 100],
         [100, 81],
         [100, 100],
-
     ])
     pitch = Pitch(pitch_type='wyscout', axis=True,
                   positional=True,
@@ -270,11 +271,11 @@ def draw_wide_spaces_and_half_spaces():
     x_start, y_start = areas.T
     plt.scatter(x_start, y_start)
     plt.show()
-
     areas = np.array([
         [84, 19],
         [100, 19],
         [84, 81],
+        [100, 81],
         [100, 81],
     ])
     pitch_2 = Pitch(pitch_type='wyscout', axis=True,
@@ -285,6 +286,23 @@ def draw_wide_spaces_and_half_spaces():
     x_start, y_start = areas.T
     plt.scatter(x_start, y_start)
     plt.show()
+
+#Plot to display distribution of values pr class in sorted order
+
+def display_target_counts(data):
+    sum = data.ip_cluster.value_counts().sum()
+    targets = data.groupby(["ip_cluster"])["ip_cluster"].count().reset_index(name="count")
+    targets['percentage'] = targets['count'].apply(lambda row: (row / sum) * 100)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
+    plt.title("Percentage distribution of clusters")
+    sns.distplot(a = data.ip_cluster, color = 'red', hist_kws={"edgecolor": 'white'}, ax=ax1)
+    plt.bar(targets['ip_cluster'], targets['percentage'])
+    plt.show()
+    return targets[['ip_cluster', 'percentage']]
+
+   # data['ip_cluster'].value_counts().sort_index().plot(kind='bar')
+
+
 
 
 '''

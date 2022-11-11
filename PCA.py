@@ -4,7 +4,6 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import matplotlib.pyplot as plt
-from advanced_pca import CustomPCA
 
 
 # Load dataset
@@ -41,7 +40,7 @@ def_input_train, def_input_test = train_test_split(raw,test_size=0.20, random_st
 pca = PCA(n_components=0.8)
 
 #Split data in train and test sets
-X_train = pca.fit_transform(def_input_train)
+X_train = pca.fit_transform(def_input_train[["foul_e", "Sex"]])
 X_test = pca.transform(def_input_test)
 
 
@@ -52,6 +51,8 @@ explained_variance = pca.explained_variance_ratio_
 print(len(explained_variance))
 print(sum(explained_variance))
 print(explained_variance)
+
+
 
 
 plt.title("Line graph")

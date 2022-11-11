@@ -8,9 +8,12 @@ import plotly.express as px
 from sklearn.mixture import GaussianMixture
 
 # loading
-df = pd.read_csv('C:/Users/mall/OneDrive - Implement/Documents/Andet/RP/Data/events_CN_UMAP.csv',
+df = pd.read_csv('C:/ITU/ITU_Research_Project/clustered_data/events_CN_UMAP.csv',
                  sep=",",
                  encoding='unicode_escape')
+df = df.drop(['playerId', 'seasonId', 'map_group', 'pos_group', ], axis=1)
+dr_att = umap.UMAP(n_neighbors=80, min_dist=0.0, n_components=3, random_state=42).fit_transform(df)
+
 
 # creating data set
 df_id = df[['playerId', 'seasonId', 'teamId', 'map_group', 'pos_group']]

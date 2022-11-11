@@ -6,6 +6,7 @@ import plotly.express as px
 import numpy as np
 import matplotlib.pyplot as plt
 from mplsoccer import Pitch
+from sklearn.metrics import classification_report, confusion_matrix, cohen_kappa_score, accuracy_score, f1_score
 
 #Unused imports
 '''
@@ -74,7 +75,8 @@ def make_spider_web(raw_data, stat, title_att):
   fig = go.Figure(layout=go.Layout(
       title=go.layout.Title(text='Comparison clusters - ' + title_att ),
       polar={'radialaxis': {'visible': True}},
-      showlegend=True
+      showlegend=True,
+      template="plotly_dark"
   ))
 
   fig.add_trace(
@@ -87,7 +89,7 @@ def make_spider_web(raw_data, stat, title_att):
       fig.add_trace(
           go.Scatterpolar(r=frame.vals, fill='toself', opacity=0.4, theta=frame.labels, name="# Cluster " + str(cluster)),
       )
-
+  fig.update_layout(template='plotly_dark')
   pyo.plot(fig)
 
 #Spider web with closed lines
@@ -117,6 +119,8 @@ make_spider_web(data, established, "Established")
 make_spider_web(data, duels, "Duels")
 make_spider_web(data, game_reading, "Game Reading")
 make_spider_web(data, categories, "Categories")
+
+
 
 
 
