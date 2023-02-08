@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn import metrics
 
 
-# Filter to determine where an event occured
+# Filter to determine where an  occured
 def findArea(row):
     s = ""
     #  id = row['id']
